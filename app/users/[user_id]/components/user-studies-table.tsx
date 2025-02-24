@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { status_adapter } from "@/lib/adapters";
 import { cn } from "@/lib/utils";
 import { useListClientStudiesQuery } from "@/services/studies";
 import {

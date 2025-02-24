@@ -13,7 +13,7 @@ const config: Config = {
 		'bg-red-100 text-red-800 shadow-red-100 hover:bg-red-100/75',
 		"bg-yellow-100 text-yellow-800 shadow-yellow-100 hover:bg-yellow-100/75",
 		"bg-gray-100 text-gray-800 shadow-gray-100 hover:bg-gray-100/75",
-		"animate-ripple"
+		"animate-ripple bg-black/15"
 	],
 	theme: {
 		extend: {

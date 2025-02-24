@@ -18,7 +18,7 @@ export function handleRipple(e: React.MouseEvent<any>) {
     transform: translate(-50%, -50%); 
     pointer-events: none; 
     border-radius: 50%; 
-    animation: ripple 500ms linear infinite; 
+    animation: ripple 500ms linear infinite;
   `;
 
   ripples.classList.add('absolute', 'rounded-full', 'bg-black/15', 'animate-ripple');
@@ -28,3 +28,8 @@ export function handleRipple(e: React.MouseEvent<any>) {
     ripples.remove();
   }, 500);
 };
+
+export function placeholder(length: number, mayus: boolean = false): string {
+  const characters = "abcdefghijklmnopqrstuvwxyz";
+  return mayus ? characters.slice(0, length).toUpperCase() : characters.slice(0, length)
+}

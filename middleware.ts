@@ -3,8 +3,10 @@ import { User } from "./schemas/auth";
 
 const publicRoutes = ["/sign-in", "/sign-up/*"];
 const roleRoutes: Record<string, string> = {
-  Administrator: "/doctors",
-  Patient: "/studies",
+  Administrator: "/views/doctors",
+  Patient: "/views/studies",
+  Doctor: "/views/studies",
+  MedicalInstitution: "/views/studies"
 };
 
 async function getUser(token: string) {
@@ -54,8 +56,6 @@ export default async function authMiddleware(request: NextRequest) {
   if (!user) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
-
-  console.log("User:", user);
 
   if (pathname === "/") {
     const redirectRoute = roleRoutes[user.userable_type];

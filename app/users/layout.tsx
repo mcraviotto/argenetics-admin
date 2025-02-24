@@ -10,7 +10,7 @@ export default function UsersLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col w-full h-full">
       <Header />
       <Navbar />
-      <div className="p-6 max-w-7xl mx-auto flex flex-col w-full h-full">
+      <div className="p-6 flex flex-col w-full h-full">
         <div className="flex flex-col gap-4">
           <Breadcrumb />
           {children}

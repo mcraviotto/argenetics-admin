@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { closeDialogs, DialogsState, dialogsStateObservable } from "@/lib/store/dialogs-store";
-import { useDeleteClientMutation } from "@/services/clients";
+import { useDeleteClientMutation } from "@/services/doctors";
 import { useEffect, useState } from "react";
 
 export default function DeleteClientDialog() {

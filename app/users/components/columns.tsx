@@ -10,10 +10,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { status_adapter } from "@/lib/adapters";
 import { setDialogsState } from "@/lib/store/dialogs-store";
 import { cn } from "@/lib/utils";
-import { Client } from "@/schemas/clients";
+import { Client } from "@/schemas/doctors";
 import {
   ColumnDef,
   Row

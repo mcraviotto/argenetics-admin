@@ -17,10 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { status_adapter } from "@/lib/adapters";
 import { setDialogsState } from "@/lib/store/dialogs-store";
 import { cn } from "@/lib/utils";
-import { useListClientsQuery } from "@/services/clients";
+import { useListClientsQuery } from "@/services/doctors";
 import {
   ColumnFiltersState,
   PaginationState,

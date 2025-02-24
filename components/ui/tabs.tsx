@@ -46,10 +46,6 @@ const TabsList = React.forwardRef<
         }
         return child;
       })}
-      <div
-        className="absolute bottom-0 h-0.5 bg-primary transition-[left,width] duration-300 ease-in-out"
-        style={underlineStyle}
-      />
     </TabsPrimitive.List>
   );
 });
@@ -59,35 +55,9 @@ const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
 >(({ className, ...props }, ref) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-
-    const button = e.currentTarget;
-    const x = e.clientX - button.getBoundingClientRect().left;
-    const y = e.clientY - button.getBoundingClientRect().top;
-    const ripples = document.createElement("span");
-
-    ripples.style.cssText = `
-        left: ${x}px; 
-        top: ${y}px; 
-        position: absolute; 
-        transform: translate(-50%, -50%); 
-        pointer-events: none; 
-        border-radius: 50%; 
-        animation: ripple 500ms linear infinite; 
-        `;
-
-    ripples.classList.add(...'bg-black/15'.split(" "));
-    button.appendChild(ripples);
-
-    setTimeout(() => {
-      ripples.remove();
-    }, 500);
-  };
 
   return <TabsPrimitive.Trigger
     ref={ref}
-    onMouseDown={handleClick}
     className={cn(
       "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
       className

@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 export const s3Api = createApi({
   reducerPath: 's3Api',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
+    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
     prepareHeaders(headers) {
       if (headers.get('x-skip-auth')) {
         headers.delete('authorization');
@@ -20,14 +20,14 @@ export const s3Api = createApi({
     },
   }),
   endpoints: (builder) => ({
-    uploadFileToS3: builder.mutation<string, { file: File, client_id: string }>({
-      async queryFn({ file, client_id }, _queryApi, _extraOptions, fetchWithBQ) {
+    uploadFileToS3: builder.mutation<string, { file: File, patient_id: string }>({
+      async queryFn({ file, patient_id }, _queryApi, _extraOptions, fetchWithBQ) {
         const s3ParamsResult = await fetchWithBQ({
-          url: '/client_studies/upload_link',
+          url: '/studies/upload_link',
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            client_id,
+            patient_id,
             file_name: file.name,
           }),
         });

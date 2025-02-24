@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { setDialogsState } from "@/lib/store/dialogs-store";
 import { cn } from "@/lib/utils";
-import { useGetClientQuery } from "@/services/clients";
+import { useGetClientQuery } from "@/services/doctors";
 import { useUploadFileToS3Mutation } from "@/services/s3";
 import { useCreateStudyMutation, useGetStudyQuery } from "@/services/studies";
 import { zodResolver } from "@hookform/resolvers/zod";

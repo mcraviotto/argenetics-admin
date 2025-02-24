@@ -298,7 +298,7 @@ export default function PatientRegisterPage() {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="p-0 w-[--radix-popover-trigger-width]">
                       <Command>
                         <CommandInput
                           placeholder="Buscar provincia"

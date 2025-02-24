@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useGetClientQuery } from "@/services/clients";
+import { useGetClientQuery } from "@/services/doctors";
 import { useDownloadClientStudyMutation, useGetClientStudyQuery } from "@/services/studies";
 import { useParams } from "next/navigation";
 import { Label } from "@/components/ui/label";

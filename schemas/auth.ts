@@ -21,7 +21,6 @@ const personCommonSchema = z.object({
   phone_number: z.string({ required_error: "El número de teléfono es requerido" }).min(3, { message: "El número de teléfono es requerido" }),
 });
 
-
 export const newPatientSchema = baseUserSchema.extend({
   role: z.literal("patient"),
 })
@@ -36,16 +35,16 @@ export const newDoctorSchema = baseUserSchema.extend({
 })
   .merge(personCommonSchema)
   .extend({
-    specialty: z.string(),
+    specialty: z.string({ required_error: "La especialidad es requerida" }).min(1, { message: "La especialidad es requerida" }),
   });
 
 export const newMedicalInstitutionSchema = baseUserSchema.extend({
   role: z.literal("medical_institution"),
-  name: z.string(),
-  fiscal_number: z.string(),
-  primary_phone_number: z.string(),
+  name: z.string({ required_error: "El nombre es requerido" }).min(1, { message: "El nombre es requerido" }),
+  fiscal_number: z.string({ required_error: "El número de identificación fiscal es requerido" }).min(1, { message: "El número de identificación fiscal es requerido" }),
+  primary_phone_number: z.string({ required_error: "El número de teléfono es requerido" }).min(3, { message: "El número de teléfono es requerido" }),
   secondary_phone_number: z.string().optional(),
-  address: z.string(),
+  address: z.string({ required_error: "La dirección es requerida" }).min(1, { message: "La dirección es requerida" }),
 });
 
 export const signUpSchema = z.discriminatedUnion("role", [
@@ -71,7 +70,7 @@ export const userSchema = z.object({
   id: z.string(),
   email: z.string(),
   userable_type: z.enum(["Administrator", "Patient", "Institution", "Doctor"]),
-  state: z.enum(["active", "inactive"]),
+  state: z.enum(["active", "pending", "rejected"]),
   confirmed: z.boolean(),
   userable: z.object({
     id: z.string(),

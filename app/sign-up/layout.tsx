@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -14,7 +13,6 @@ export default function SignUpLayout({ children }: { children: React.ReactNode }
       <div className="flex flex-col gap-6 items-center min-w-[450px]">
         <Image src="/argenetics-logo.webp" width={200} height={30} alt="Argenetics" priority />
         {children}
-        <Toaster />
       </div>
     </div>
   )

@@ -8,9 +8,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { gender_adapter, status_adapter } from "@/lib/adapters";
 import { cn } from "@/lib/utils";
-import { useGetClientQuery } from "@/services/clients";
+import { useGetClientQuery } from "@/services/doctors";
 import { format, parse } from "date-fns";
 import { Cake, IdCard, Mail, Pencil, Phone, Plus, User } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";

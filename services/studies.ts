@@ -1,12 +1,11 @@
-import { ClientStudies } from '@/schemas/clients';
-import { Study } from '@/schemas/studies';
+import { ListStudiesResponse, ListStudy, NewStudy } from '@/schemas/studies';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
 
 export const studiesApi = createApi({
   reducerPath: 'studiesApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
+    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
     prepareHeaders(headers) {
       const token = Cookies.get('sessionToken');
       if (token) {
@@ -17,51 +16,32 @@ export const studiesApi = createApi({
   }),
   tagTypes: ['Study', 'GetStudy'],
   endpoints: (builder) => ({
-    listStudies: builder.query<Study[], void>({
-      query: () => '/studies',
-    }),
-    listClientStudies: builder.query<ClientStudies, string>({
-      query: (id) => `/client_studies?client_id=${id}`,
+    listStudies: builder.query<ListStudiesResponse, { page?: number, query: string, state?: string, date?: string }>({
+      query: ({ page = 1, query, state, date }) => `/studies?page=${page}&query=${query}&state=${state}&date=${date}`,
       providesTags: ['Study'],
     }),
-    getStudy: builder.query<Study, string>({
-      query: (code) => `/studies/${code}`,
+    getStudy: builder.query<ListStudy, string>({
+      query: (id) => `/studies/${id}`,
+      providesTags: ['Study'],
     }),
-    getClientStudy: builder.query<ClientStudies['data'][0], string>({
-      query: (id) => `/client_studies/${id}`,
-      providesTags: (result, error, id) => [{ type: 'GetStudy', id }],
+    downloadStudy: builder.query<{ url: string }, { document_type: string, id: string }>({
+      query: ({ document_type, id }) => `/studies/${id}/download_link?document_type=${document_type}`,
     }),
-    getClientStudyDownloadLink: builder.query<{ url: string }, string>({
-      query: (id) => `/client_studies/${id}/download_link`,
-    }),
-    deleteClientStudy: builder.mutation<{ id: string }, string>({
-      query: (id) => ({
-        url: `/client_studies/${id}`,
-        method: 'DELETE',
+    updateStudy: builder.mutation<ListStudy, Omit<NewStudy, "storage_ref" | "medical_order_ref" | "additional_docs_storage_ref"> & { id: string, storage_ref: string, medical_order_ref?: string, additional_docs_storage_ref?: string }>({
+      query: ({ id, ...body }) => ({
+        url: `/studies/${id}`,
+        method: 'PUT',
+        body,
       }),
       invalidatesTags: ['Study'],
     }),
-    createStudy: builder.mutation<
-      Study,
-      { storage_ref: string; study_code: string; client_id: string; metadata: object }
-    >({
+    createStudy: builder.mutation<ListStudy, Omit<NewStudy, "storage_ref" | "medical_order_ref" | "additional_docs_storage_ref" | "state"> & { storage_ref: string, medical_order_ref?: string, additional_docs_storage_ref?: string }>({
       query: (body) => ({
-        url: '/client_studies',
+        url: '/studies',
         method: 'POST',
         body,
       }),
       invalidatesTags: ['Study'],
-    }),
-    updateStudy: builder.mutation<Study, Partial<{ storage_ref: string; study_code: string; client_id: string; metadata: object }> & { id: string }>({
-      query: ({ id, ...body }) => ({
-        url: `/client_studies/${id}`,
-        method: 'PUT',
-        body,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'GetStudy', id }],
-    }),
-    downloadClientStudy: builder.mutation<{ url: string }, string>({
-      query: (id) => `/client_studies/${id}/download_link`,
     }),
   }),
 });
@@ -69,11 +49,8 @@ export const studiesApi = createApi({
 export const {
   useListStudiesQuery,
   useGetStudyQuery,
-  useCreateStudyMutation,
-  useListClientStudiesQuery,
-  useGetClientStudyQuery,
-  useGetClientStudyDownloadLinkQuery,
-  useDeleteClientStudyMutation,
-  useDownloadClientStudyMutation,
+  useDownloadStudyQuery,
+  useLazyDownloadStudyQuery,
   useUpdateStudyMutation,
+  useCreateStudyMutation,
 } = studiesApi;

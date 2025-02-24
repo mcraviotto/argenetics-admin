@@ -8,10 +8,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { study_status_adapter } from "@/lib/adapters";
 import { setDialogsState } from "@/lib/store/dialogs-store";
 import { cn } from "@/lib/utils";
-import { ClientStudies } from "@/schemas/clients";
+import { ClientStudies } from "@/schemas/doctors";
 import { useDownloadClientStudyMutation } from "@/services/studies";
 import {
   ColumnDef,

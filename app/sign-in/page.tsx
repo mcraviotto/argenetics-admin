@@ -48,7 +48,7 @@ export default function SignIn() {
         Cookies.set('sessionToken', response.token);
       }
 
-      router.push("/")
+      router.push("/views")
     } catch (err: any) {
       toast({
         title: "Algo salió mal",
