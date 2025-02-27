@@ -21,7 +21,7 @@ import { z } from "zod";
 import { study_options } from "../data";
 import { useEffect } from "react";
 
-export const createAdaptedNewStudySchema = (userableType: string) =>
+const createAdaptedNewStudySchema = (userableType: string) =>
   newStudySchema
     .omit({
       medical_order_ref: true,
