@@ -1,24 +1,7 @@
+import { api } from '@/api';
 import { S3Params } from '@/schemas/s3';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
 
-export const s3Api = createApi({
-  reducerPath: 's3Api',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
-    prepareHeaders(headers) {
-      if (headers.get('x-skip-auth')) {
-        headers.delete('authorization');
-        headers.delete('x-skip-auth');
-        return headers;
-      }
-      const token = Cookies.get('sessionToken');
-      if (token) {
-        headers.set('authorization', `${token}`);
-      }
-      return headers;
-    },
-  }),
+export const s3Api = api.injectEndpoints({
   endpoints: (builder) => ({
     uploadFileToS3: builder.mutation<string, { file: File, patient_id: string }>({
       async queryFn({ file, patient_id }, _queryApi, _extraOptions, fetchWithBQ) {
@@ -64,6 +47,7 @@ export const s3Api = createApi({
       },
     }),
   }),
+  overrideExisting: false,
 })
 
 export const {

@@ -74,6 +74,7 @@ export const userSchema = z.object({
   confirmed: z.boolean(),
   userable: z.object({
     id: z.string(),
+    name: z.string(),
     first_name: z.string(),
     last_name: z.string(),
     abilities: z.string()

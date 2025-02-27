@@ -13,8 +13,8 @@ import { useUserQuery } from "@/services/auth";
 import Cookies from 'js-cookie';
 import { LogOut } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
-import { Button } from "./ui/button";
 import Image from "next/image";
+import { Button } from "./ui/button";
 
 export default function Header() {
   const router = useTransitionRouter()
@@ -26,7 +26,11 @@ export default function Header() {
     router.push('/');
   }
 
-  const userAvatar = user && user?.userable.first_name.charAt(0) + user?.userable.last_name.charAt(0);
+  const userAvatar = user
+    ? (user.userable.first_name && user.userable.last_name
+      ? user.userable.first_name.charAt(0) + user.userable.last_name.charAt(0)
+      : user.userable.name.slice(0, 2)).toUpperCase()
+    : '';
 
   return (
     <header className="border-b px-6 bg-background">
@@ -63,7 +67,9 @@ export default function Header() {
                 </Avatar>
                 <div className="flex min-w-0 flex-col">
                   <span className="truncate text-sm font-medium text-foreground">
-                    {user?.userable.first_name} {user?.userable.last_name}
+                    {(user?.userable.first_name && user?.userable.last_name)
+                      ? `${user.userable.first_name} ${user.userable.last_name}`
+                      : user?.userable.name}
                   </span>
                   <span className="truncate text-xs font-normal text-muted-foreground">
                     {user?.email}

@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newPatientSchema } from "@/schemas/auth";
+import { useUserQuery } from "@/services/auth";
 import { useCreatePatientMutation } from "@/services/patients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -26,7 +27,7 @@ import { z } from "zod";
 const adaptedNewPatientSchema = newPatientSchema.omit({
   password: true,
 }).extend({
-  patient_state: z.enum(["active", "pending", "rejected"]),
+  patient_state: z.enum(["active", "pending", "rejected"]).optional(),
 });
 
 export default function NewPatientPage() {
@@ -35,6 +36,7 @@ export default function NewPatientPage() {
   const { toast } = useToast()
 
   const [createPatient, { isLoading }] = useCreatePatientMutation();
+  const { data: user, isLoading: isUserLoading } = useUserQuery()
 
   const form = useForm<z.infer<typeof adaptedNewPatientSchema>>({
     resolver: zodResolver(adaptedNewPatientSchema),
@@ -75,7 +77,7 @@ export default function NewPatientPage() {
       <h1 className="text-xl font-semibold">Nuevo paciente</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="bg-background p-6 rounded-md shadow-lg shadow-border space-y-6 flex flex-col">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4 transition-all", isUserLoading && "blur-md")}>
             <FormField
               control={form.control}
               name="first_name"
@@ -373,38 +375,40 @@ export default function NewPatientPage() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="patient_state"
-              render={({ field }) => (
-                <FormItem className="flex flex-col group">
-                  <FormLabel className={cn(
-                    "transition-colors group-has-[button[data-state=open]]:text-primary",
-                    form.formState.errors.state && "group-has-[button[data-state=open]]:text-destructive"
-                  )}>
-                    Estado
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger
-                        className={cn("state-trigger", form.formState.errors.state && "border-destructive hover:border-destructive focus-visible:!border-destructive focus-visible:!shadow-destructive/25 data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25")}
-                      >
-                        <SelectValue placeholder="Selecciona un estado" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="active">Activo</SelectItem>
-                      <SelectItem value="pending">Pendiente</SelectItem>
-                      <SelectItem value="rejected">Rechazado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {user?.userable_type !== 'Doctor' && (
+              <FormField
+                control={form.control}
+                name="patient_state"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col group">
+                    <FormLabel className={cn(
+                      "transition-colors group-has-[button[data-state=open]]:text-primary",
+                      form.formState.errors.state && "group-has-[button[data-state=open]]:text-destructive"
+                    )}>
+                      Estado
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger
+                          className={cn("state-trigger", form.formState.errors.state && "border-destructive hover:border-destructive focus-visible:!border-destructive focus-visible:!shadow-destructive/25 data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25")}
+                        >
+                          <SelectValue placeholder="Selecciona un estado" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="active">Activo</SelectItem>
+                        <SelectItem value="pending">Pendiente</SelectItem>
+                        <SelectItem value="rejected">Rechazado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
           <div className="flex gap-2 ml-auto w-fit">
             <Button

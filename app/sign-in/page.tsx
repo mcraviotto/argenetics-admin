@@ -1,5 +1,6 @@
 'use client'
 
+import { api } from "@/api"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { signInSchema } from "@/schemas/auth"
 import { useSignInMutation } from "@/services/auth"
+import { store } from "@/store"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Cookies from 'js-cookie'
 import { Eye, EyeOff } from "lucide-react"
@@ -49,6 +51,7 @@ export default function SignIn() {
       }
 
       router.push("/views")
+      store.dispatch(api.util.resetApiState());
     } catch (err: any) {
       toast({
         title: "Algo salió mal",

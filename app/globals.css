@@ -114,7 +114,12 @@
 
   body {
     @apply text-foreground bg-accent;
+    @apply h-full;
     font-family: var(--font-geist-sans);
+  }
+
+  html {
+    @apply h-full
   }
 }
 

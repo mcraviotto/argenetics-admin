@@ -5,6 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,13 +15,15 @@ import {
   ColumnDef,
   Row
 } from "@tanstack/react-table";
-import { Ellipsis, Eye, SquarePen } from "lucide-react";
+import { Ellipsis, Eye, FileDownIcon, LucideBookDown, SquarePen } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { study_status_adapter } from "../utils";
 import { study_options } from "../data";
+import { useUserQuery } from "@/services/auth";
 
 function RowActions({ row }: { row: Row<ListStudy> }) {
   const router = useTransitionRouter()
+  const { data: user } = useUserQuery()
 
   return (
     <TooltipProvider delayDuration={1000}>
@@ -39,14 +42,16 @@ function RowActions({ row }: { row: Row<ListStudy> }) {
               <span>Ver detalles</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => router.push(`/views/studies/${row.original.id}/edit`)}
-            >
-              <SquarePen />
-              <span>Editar</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+          {user?.userable_type === "Administrator" &&
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => router.push(`/views/studies/${row.original.id}/edit`)}
+              >
+                <SquarePen />
+                <span>Editar</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          }
         </DropdownMenuContent>
       </DropdownMenu>
     </TooltipProvider>

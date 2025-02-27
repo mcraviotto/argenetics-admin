@@ -2,19 +2,23 @@
 export const study_status_adapter = {
   ready_to_download: {
     label: "Activo",
+    patientLabel: "Listo para descargar.",
     color: "bg-green-200/50 text-green-700 hover:bg-green-300/50",
   },
   expired: {
     label: "Expirado",
     color: "bg-red-200/50 text-red-700 hover:bg-red-300/50",
+    patientLabel: "El estudio ha expirado.",
   },
   requested_to_download: {
     label: "Solicitado",
     color: "bg-amber-200/50 text-amber-700 hover:bg-amber-300/50",
+    patientLabel: "Enviamos tu solicitud de descarga.",
   },
   initial: {
     label: "Inicial",
     color: "bg-gray-200/50 text-gray-700 hover:bg-gray-300/50",
+    patientLabel: "Solicitado, enviamos tu solicitud de estudios.",
   },
 }
 

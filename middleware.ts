@@ -2,23 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { User } from "./schemas/auth";
 
 const publicRoutes = ["/sign-in", "/sign-up/*"];
-const roleRoutes: Record<string, string> = {
-  Administrator: "/views/doctors",
+
+const roleRedirects: Record<string, string> = {
+  Administrator: "/views/studies",
   Patient: "/views/studies",
   Doctor: "/views/studies",
-  MedicalInstitution: "/views/studies"
+  MedicalInstitution: "/views/studies",
 };
+
+const allowedRoutes: Record<string, string[]> = {
+  Administrator: ["/views/*"],
+  Doctor: ["/views/studies/*", "/views/patients/*"],
+  Patient: ["/views/studies/*"],
+  MedicalInstitution: ["/views/studies/*", "/views/doctors/*", "/views/patients/*"],
+};
+
+function matchPattern(pathname: string, pattern: string): boolean {
+  if (pattern.endsWith("/*")) {
+    const base = pattern.slice(0, -1);
+    return pathname === base.slice(0, -1) || pathname.startsWith(base);
+  }
+  return pathname === pattern;
+}
 
 async function getUser(token: string) {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/users/me`, {
       headers: { authorization: token },
     });
+    if (!response.ok) throw new Error("No se pudo obtener la información del usuario");
 
-    if (!response.ok) {
-      throw new Error("No se pudo obtener la información del usuario");
-    }
-    return (await response.json()) as User;
+    const user = (await response.json()) as User;
+    return user;
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
     return null;
@@ -31,15 +46,9 @@ function isPublicRoute(pathname: string, routes: string[]): boolean {
       const baseRoute = route.slice(0, -2);
       return pathname === baseRoute || pathname.startsWith(`${baseRoute}/`);
     }
-    if (route.includes("*")) {
-      const regex = new RegExp("^" + route.replace(/\*/g, ".*") + "$");
-      return regex.test(pathname);
-    }
     return pathname === route;
   });
 }
-
-
 export default async function authMiddleware(request: NextRequest) {
   const sessionToken = request.cookies.get("sessionToken")?.value;
   const pathname = request.nextUrl.pathname;
@@ -49,6 +58,7 @@ export default async function authMiddleware(request: NextRequest) {
   }
 
   if (!sessionToken) {
+    console.log("No session token");
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
@@ -57,12 +67,35 @@ export default async function authMiddleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
+  if (!user.confirmed && pathname !== "/otp") {
+    return NextResponse.redirect(new URL("/otp", request.url));
+  }
+  if (user.confirmed && pathname === "/otp") {
+    const redirectRoute = roleRedirects[user.userable_type] || "/";
+    return NextResponse.redirect(new URL(redirectRoute, request.url));
+  }
+
+  if (user.confirmed && user.state !== "active" && pathname !== "/waiting") {
+    return NextResponse.redirect(new URL("/waiting", request.url));
+  }
+
+  if (user.state === "active" && pathname === "/waiting") {
+    const redirectRoute = roleRedirects[user.userable_type] || "/";
+    return NextResponse.redirect(new URL(redirectRoute, request.url));
+  }
+
   if (pathname === "/") {
-    const redirectRoute = roleRoutes[user.userable_type];
-    if (redirectRoute) {
+    const redirectRoute = roleRedirects[user.userable_type] || "/sign-in";
+    return NextResponse.redirect(new URL(redirectRoute, request.url));
+  }
+
+  if (pathname.startsWith("/views")) {
+    const allowed = allowedRoutes[user.userable_type] || [];
+    const isAllowed = allowed.some((pattern) => matchPattern(pathname, pattern));
+    if (!isAllowed) {
+      const redirectRoute = roleRedirects[user.userable_type] || "/sign-in";
       return NextResponse.redirect(new URL(redirectRoute, request.url));
     }
-    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   return NextResponse.next();

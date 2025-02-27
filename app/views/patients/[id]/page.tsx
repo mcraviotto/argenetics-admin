@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button";
 import { cn, placeholder } from "@/lib/utils";
 import { useGetPatientQuery } from "@/services/patients";
 import { ArrowLeft, Edit } from "lucide-react";
-import { Link } from "next-view-transitions";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { useParams } from "next/navigation";
 import { patient_status_adapter } from "../utils";
 import { provinces } from "@/app/data";
+import { useUserQuery } from "@/services/auth";
 
 export default function PatientPage() {
   const params = useParams<{ id: string }>()
+  const router = useTransitionRouter()
 
   const { data: patient, isLoading } = useGetPatientQuery(params.id)
+  const { data: user } = useUserQuery()
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -102,12 +105,11 @@ export default function PatientPage() {
             </Link>
           </Button>
           <Button
-            asChild
+            onClick={() => router.push(`/views/patients/${params.id}/edit`)}
+            disabled={user?.userable_type !== "Administrator"}
           >
-            <Link href={`/views/patients/${params.id}/edit`}>
-              <Edit />
-              Editar
-            </Link>
+            <Edit />
+            Editar
           </Button>
         </div>
       </div>

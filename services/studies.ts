@@ -1,23 +1,10 @@
+import { api } from '@/api';
 import { ListStudiesResponse, ListStudy, NewStudy } from '@/schemas/studies';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
 
-export const studiesApi = createApi({
-  reducerPath: 'studiesApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
-    prepareHeaders(headers) {
-      const token = Cookies.get('sessionToken');
-      if (token) {
-        headers.set('authorization', `${token}`);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ['Study', 'GetStudy'],
+export const studiesApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    listStudies: builder.query<ListStudiesResponse, { page?: number, query: string, state?: string, date?: string }>({
-      query: ({ page = 1, query, state, date }) => `/studies?page=${page}&query=${query}&state=${state}&date=${date}`,
+    listStudies: builder.query<ListStudiesResponse, { page?: number, query: string, state?: string, date?: string, medical_institution_id?: string; }>({
+      query: ({ page = 1, query, state, date, medical_institution_id }) => `/studies?page=${page}&query=${query}&state=${state}&date=${date}&medical_institution_id=${medical_institution_id}`,
       providesTags: ['Study'],
     }),
     getStudy: builder.query<ListStudy, string>({
@@ -44,6 +31,7 @@ export const studiesApi = createApi({
       invalidatesTags: ['Study'],
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {

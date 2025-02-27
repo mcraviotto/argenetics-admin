@@ -4,16 +4,19 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn, placeholder } from "@/lib/utils";
 import { useGetStudyQuery, useLazyDownloadStudyQuery } from "@/services/studies";
 import { ArrowLeft, CheckIcon, Download, Edit, X } from "lucide-react";
-import { Link } from "next-view-transitions";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { study_options } from "../data";
 import { downloadFileFromUrl, formatReference, study_status_adapter } from "../utils";
+import { useUserQuery } from "@/services/auth";
 
 export default function StudyPage() {
   const params = useParams<{ id: string }>();
+  const router = useTransitionRouter();
 
   const { data: study, isLoading } = useGetStudyQuery(params.id);
+  const { data: user } = useUserQuery()
   const [downloadStudy] = useLazyDownloadStudyQuery();
 
   const [downloadStates, setDownloadStates] = useState<{ [key: string]: "success" | "failed" | null }>({});
@@ -177,11 +180,12 @@ export default function StudyPage() {
               Volver
             </Link>
           </Button>
-          <Button asChild>
-            <Link href={`/views/studies/${params.id}/edit`}>
-              <Edit />
-              Editar
-            </Link>
+          <Button
+            disabled={user?.userable_type !== "Administrator"}
+            onClick={() => router.push(`/views/studies/${params.id}/edit`)}
+          >
+            <Edit />
+            Editar
           </Button>
         </div>
       </div>

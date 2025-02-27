@@ -40,7 +40,6 @@ export const newStudySchema = z.object({
   doctor_id: z.string().optional(),
 })
 
-
 export type ListStudy = z.infer<typeof listStudySchema>
 export type ListStudiesResponse = z.infer<typeof listStudiesResponseSchema>
 

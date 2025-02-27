@@ -1,20 +1,7 @@
+import { api } from '@/api';
 import { AllInstitutions, ListInstitution, ListInstitutionsResponse, NewInstitution } from '@/schemas/institutions';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import Cookies from 'js-cookie';
 
-export const institutionsApi = createApi({
-  reducerPath: 'institutionsApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
-    prepareHeaders(headers) {
-      const token = Cookies.get('sessionToken');
-      if (token) {
-        headers.set('authorization', token);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ['Institutions'],
+export const institutionsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     listInstitutions: builder.query<ListInstitutionsResponse, { page?: number, query: string, state?: string }>({
       query: ({ query, page = 1, state }) => `/medical_institutions?page=${page}&query=${query}&state=${state}`,
@@ -45,6 +32,7 @@ export const institutionsApi = createApi({
       invalidatesTags: ['Institutions'],
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {

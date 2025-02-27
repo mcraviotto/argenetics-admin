@@ -17,9 +17,12 @@ import {
 import { Ellipsis, Eye, SquarePen } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { patient_status_adapter } from "../utils";
+import { useUserQuery } from "@/services/auth";
 
 function RowActions({ row }: { row: Row<ListPatient> }) {
   const router = useTransitionRouter()
+
+  const { data: user } = useUserQuery()
 
   return (
     <TooltipProvider delayDuration={1000}>
@@ -40,6 +43,7 @@ function RowActions({ row }: { row: Row<ListPatient> }) {
           </DropdownMenuGroup>
           <DropdownMenuGroup>
             <DropdownMenuItem
+              disabled={user?.userable_type !== "Administrator"}
               onClick={() => router.push(`/views/patients/${row.original.id}/edit`)}
             >
               <SquarePen />

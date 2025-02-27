@@ -1,19 +1,7 @@
-import { SignInRequest, SignInResponse, SignUpRequest, User } from '@/schemas/auth'
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import Cookies from 'js-cookie';
+import { api } from '@/api';
+import { SignInRequest, SignInResponse, SignUpRequest, User } from '@/schemas/auth';
 
-export const authApi = createApi({
-  reducerPath: 'authApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
-    prepareHeaders(headers) {
-      const token = Cookies.get('sessionToken')
-      if (token) {
-        headers.set('authorization', `${token}`)
-      }
-      return headers
-    },
-  }),
+export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     signIn: builder.mutation<SignInResponse, SignInRequest>({
       query: (body) => ({
@@ -32,11 +20,20 @@ export const authApi = createApi({
         body,
       }),
     }),
+    verifyToken: builder.mutation<void, { token: string }>({
+      query: ({ token }) => ({
+        url: '/users/validate_token',
+        method: 'POST',
+        body: { token },
+      }),
+    }),
   }),
+  overrideExisting: false,
 })
 
 export const {
   useSignInMutation,
   useUserQuery,
   useSignUpMutation,
+  useVerifyTokenMutation,
 } = authApi

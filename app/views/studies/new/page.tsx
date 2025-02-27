@@ -5,36 +5,56 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newStudySchema } from "@/schemas/studies";
+import { useUserQuery } from "@/services/auth";
 import { useGetAllDoctorsQuery } from "@/services/doctors";
 import { useGetAllPatientsQuery } from "@/services/patients";
 import { useUploadFileToS3Mutation } from "@/services/s3";
-import { useCreateStudyMutation, useGetStudyQuery, useUpdateStudyMutation } from "@/services/studies";
+import { useCreateStudyMutation } from "@/services/studies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CheckIcon, ChevronsUpDown, FileIcon, Save, X } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { study_options } from "../data";
+import { useEffect } from "react";
 
-const adaptedNewStudySchema = newStudySchema
-  .omit({
-    medical_order_ref: true,
-    storage_ref: true,
-    additional_docs_storage_ref: true,
-    state: true,
-  })
-  .extend({
-    study_category_id: z.string({ required_error: "La categoría de estudio es requerida" }),
-    result: z.instanceof(File, { message: "El resultado es requerido" }),
-    medical_order: z.instanceof(File).optional(),
-    additional_docs: z.instanceof(File).optional(),
-  });
+export const createAdaptedNewStudySchema = (userableType: string) =>
+  newStudySchema
+    .omit({
+      medical_order_ref: true,
+      storage_ref: true,
+      additional_docs_storage_ref: true,
+      state: true,
+    })
+    .extend({
+      study_category_id: z.string({ required_error: "La categoría de estudio es requerida" }),
+      result: z.instanceof(File).optional(),
+      medical_order: z.instanceof(File).optional(),
+      additional_docs: z.instanceof(File).optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (userableType === "Patient" || userableType === "Doctor") {
+        if (!data.medical_order) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La orden médica es requerida",
+            path: ["medical_order"],
+          });
+        }
+      } else {
+        if (!data.result) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "El resultado es requerido",
+            path: ["result"],
+          });
+        }
+      }
+    });
+
 
 export default function NewStudyPage() {
   const router = useTransitionRouter();
@@ -43,15 +63,23 @@ export default function NewStudyPage() {
 
   const { data: patients } = useGetAllPatientsQuery()
   const { data: doctors } = useGetAllDoctorsQuery()
+  const { data: user, isLoading: isUserLoading } = useUserQuery()
 
   const [createStudy, { isLoading }] = useCreateStudyMutation()
   const [uploadFileToS3, { isLoading: isUploadingFile }] = useUploadFileToS3Mutation();
 
-  const form = useForm<z.infer<typeof adaptedNewStudySchema>>({
-    resolver: zodResolver(adaptedNewStudySchema),
+  const adaptedSchema = createAdaptedNewStudySchema(user?.userable_type || "")
+
+  const form = useForm<z.infer<typeof adaptedSchema>>({
+    resolver: zodResolver(adaptedSchema),
+    defaultValues: {
+      patient_id: undefined,
+      doctor_id: undefined,
+    },
   })
 
-  async function onSubmit(values: z.infer<typeof adaptedNewStudySchema>) {
+  async function onSubmit(values: z.infer<typeof adaptedSchema>) {
+    console.log(values)
     try {
       const { result, medical_order, additional_docs, study_category_id, ...data } = values
 
@@ -88,12 +116,21 @@ export default function NewStudyPage() {
   const selected_category = useWatch({ control: form.control, name: "study_category_id" })
   const study_type = useWatch({ control: form.control, name: "title" })
 
+  useEffect(() => {
+    if (user && user?.userable_type === "Patient") {
+      form.setValue("patient_id", user.userable.id)
+    }
+    if (user && user?.userable_type === "Doctor") {
+      form.setValue("doctor_id", user.userable.id)
+    }
+  }, [user])
+
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Editar estudio</h1>
+      <h1 className="text-xl font-semibold">Nuevo estudio</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="bg-background p-6 rounded-md shadow-lg shadow-border space-y-6 flex flex-col">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-4 transition-all", isUserLoading && "blur-md")}>
             <FormField
               control={form.control}
               name="study_category_id"
@@ -243,177 +280,148 @@ export default function NewStudyPage() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="patient_id"
-              render={({ field }) => (
-                <FormItem className="flex flex-col group">
-                  <FormLabel
-                    className={cn(
-                      "transition-colors group-has-[button[data-state=open]]:text-primary",
-                      form.formState.errors.patient_id && "group-has-[button[data-state=open]]:text-destructive"
-                    )}
-                  >
-                    Paciente
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25",
-                            form.formState.errors.patient_id && "border-destructive hover:border-destructive data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25",
-                            !field.value && "text-muted-foreground/50 font-normal"
-                          )}
-                        >
-                          {field.value ? patients?.find((patient) => patient.id === field.value)?.name : "Selecciona un paciente"}
-                          <ChevronsUpDown className="opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0 w-[--radix-popover-trigger-width]">
-                      <Command>
-                        <CommandInput
-                          placeholder="Buscar..."
-                          className="h-10"
-                        />
-                        <CommandList className="p-1">
-                          <CommandEmpty>
-                            No hay resultados
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {patients?.map((patient) => (
-                              <CommandItem
-                                value={patient.id}
-                                key={patient.id}
-                                onSelect={() => {
-                                  form.setValue("patient_id", patient.id)
-                                }}
-                              >
-                                {patient.name}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto",
-                                    patient.id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="doctor_id"
-              render={({ field }) => (
-                <FormItem className="flex flex-col group">
-                  <FormLabel
-                    className={cn(
-                      "transition-colors group-has-[button[data-state=open]]:text-primary",
-                      form.formState.errors.doctor_id && "group-has-[button[data-state=open]]:text-destructive"
-                    )}
-                  >
-                    Médico
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25",
-                            form.formState.errors.doctor_id && "border-destructive hover:border-destructive data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25",
-                            !field.value && "text-muted-foreground/50 font-normal"
-                          )}
-                        >
-                          {field.value ? doctors?.find((doctor) => doctor.id === field.value)?.name : "Selecciona un doctor"}
-                          <ChevronsUpDown className="opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0 w-[--radix-popover-trigger-width]">
-                      <Command>
-                        <CommandInput
-                          placeholder="Buscar..."
-                          className="h-10"
-                        />
-                        <CommandList className="p-1">
-                          <CommandEmpty>
-                            No hay resultados
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {doctors?.map((doctor) => (
-                              <CommandItem
-                                value={doctor.id}
-                                key={doctor.id}
-                                onSelect={() => {
-                                  form.setValue("doctor_id", doctor.id)
-                                }}
-                              >
-                                {doctor.name}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto",
-                                    doctor.id === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* <FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <FormItem className="flex flex-col group">
-                  <FormLabel className={cn(
-                    "transition-colors group-has-[button[data-state=open]]:text-primary",
-                    form.formState.errors.state && "group-has-[button[data-state=open]]:text-destructive"
-                  )}>
-                    Estado
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger
-                        className={cn("state-trigger", form.formState.errors.state && "border-destructive hover:border-destructive focus-visible:!border-destructive focus-visible:!shadow-destructive/25 data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25")}
-                      >
-                        <SelectValue placeholder="Selecciona un estado" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="ready_to_download">Listo para descargar</SelectItem>
-                      <SelectItem value="initial">Inicial</SelectItem>
-                      <SelectItem value="requested_to_download">Solicitado para descargar</SelectItem>
-                      <SelectItem value="expired">Expirado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
+            {user?.userable_type !== "Patient" && (
+              <FormField
+                control={form.control}
+                name="patient_id"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col group">
+                    <FormLabel
+                      className={cn(
+                        "transition-colors group-has-[button[data-state=open]]:text-primary",
+                        form.formState.errors.patient_id && "group-has-[button[data-state=open]]:text-destructive"
+                      )}
+                    >
+                      Paciente
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25",
+                              form.formState.errors.patient_id && "border-destructive hover:border-destructive data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25",
+                              !field.value && "text-muted-foreground/50 font-normal"
+                            )}
+                          >
+                            {field.value ? patients?.find((patient) => patient.id === field.value)?.name : "Selecciona un paciente"}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0 w-[--radix-popover-trigger-width]">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar..."
+                            className="h-10"
+                          />
+                          <CommandList className="p-1">
+                            <CommandEmpty>
+                              No hay resultados
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {patients?.map((patient) => (
+                                <CommandItem
+                                  value={patient.id}
+                                  key={patient.id}
+                                  onSelect={() => {
+                                    form.setValue("patient_id", patient.id)
+                                  }}
+                                >
+                                  {patient.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto",
+                                      patient.id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {user?.userable_type !== "Doctor" && (
+              <FormField
+                control={form.control}
+                name="doctor_id"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col group">
+                    <FormLabel
+                      className={cn(
+                        "transition-colors group-has-[button[data-state=open]]:text-primary",
+                        form.formState.errors.doctor_id && "group-has-[button[data-state=open]]:text-destructive"
+                      )}
+                    >
+                      Médico (opcional)
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25",
+                              form.formState.errors.doctor_id && "border-destructive hover:border-destructive data-[state=open]:!border-destructive data-[state=open]:!shadow-destructive/25",
+                              !field.value && "text-muted-foreground/50 font-normal"
+                            )}
+                          >
+                            {field.value ? doctors?.find((doctor) => doctor.id === field.value)?.name : "Selecciona un doctor"}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0 w-[--radix-popover-trigger-width]">
+                        <Command>
+                          <CommandInput
+                            placeholder="Buscar..."
+                            className="h-10"
+                          />
+                          <CommandList className="p-1">
+                            <CommandEmpty>
+                              No hay resultados
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {doctors?.map((doctor) => (
+                                <CommandItem
+                                  value={doctor.id}
+                                  key={doctor.id}
+                                  onSelect={() => {
+                                    form.setValue("doctor_id", doctor.id)
+                                  }}
+                                >
+                                  {doctor.name}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto",
+                                      doctor.id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="medical_order"
@@ -455,47 +463,49 @@ export default function NewStudyPage() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="result"
-              render={() => (
-                <FormItem className="space-y-1 group col-span-2">
-                  <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.result && "group-focus-within:text-destructive")}>
-                    Resultado
-                  </FormLabel>
-                  {(!!result) ? (
-                    <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
-                      <div className="flex items-center gap-2">
-                        <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
-                          <FileIcon className="w-3.5 h-3.5" />
-                        </span>
-                        <span className="font-medium text-sm">{result.name}</span>
+            {user?.userable_type !== "Patient" && user?.userable_type !== "Doctor" && (
+              <FormField
+                control={form.control}
+                name="result"
+                render={() => (
+                  <FormItem className="space-y-1 group col-span-2">
+                    <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.result && "group-focus-within:text-destructive")}>
+                      Resultado
+                    </FormLabel>
+                    {(!!result) ? (
+                      <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
+                            <FileIcon className="w-3.5 h-3.5" />
+                          </span>
+                          <span className="font-medium text-sm">{result.name}</span>
+                        </div>
+                        <Button
+                          className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                          variant="ghost"
+                          type="button"
+                          size="icon"
+                          onClick={() => {
+                            form.setValue("result", undefined, { shouldValidate: true })
+                          }}
+                        >
+                          <X />
+                        </Button>
                       </div>
-                      <Button
-                        className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
-                        variant="ghost"
-                        type="button"
-                        size="icon"
-                        onClick={() => {
-                          form.reset({ result })
-                        }}
-                      >
-                        <X />
-                      </Button>
-                    </div>
-                  ) :
-                    <FormControl>
-                      <FileUploader
-                        id="result"
-                        onChange={(file) => {
-                          form.setValue("result", file, { shouldValidate: true })
-                        }} />
-                    </FormControl>
-                  }
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    ) :
+                      <FormControl>
+                        <FileUploader
+                          id="result"
+                          onChange={(file) => {
+                            form.setValue("result", file, { shouldValidate: true })
+                          }} />
+                      </FormControl>
+                    }
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             {study_type === "prosigna" && (
               <FormField
                 control={form.control}

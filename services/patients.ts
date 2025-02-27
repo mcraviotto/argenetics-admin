@@ -1,20 +1,9 @@
+import { api } from '@/api';
 import { ListPatient, ListPatientsResponse, NewPatient } from '@/schemas/patients';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
 
-export const patientsApi = createApi({
-  reducerPath: 'patientsApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api`,
-    prepareHeaders(headers) {
-      const token = Cookies.get('sessionToken');
-      if (token) {
-        headers.set('authorization', token);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ['Patients'],
+export const patientsApi = api.injectEndpoints({
   endpoints: (builder) => ({
     listPatients: builder.query<ListPatientsResponse, { page?: number, query: string, state?: string, medical_institution_id?: string }>({
       query: ({ page = 1, query, state, medical_institution_id }) => `/patients?page=${page}&query=${query}&state=${state}&medical_institution_id=${medical_institution_id}`,
@@ -45,6 +34,7 @@ export const patientsApi = createApi({
       invalidatesTags: ['Patients'],
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {

@@ -104,7 +104,7 @@ export const columns: ColumnDef<ListDoctor>[] = [
                     +{extraCount}
                   </Badge>
                 </TooltipTrigger>
-                <TooltipContent className="px-2 py-1 text-xs space-x-2">
+                <TooltipContent className="px-2 text-xs max-w-[600px] flex flex-wrap gap-2">
                   {institutions.slice(2).map((institution) => (
                     <Badge
                       key={institution.id}
