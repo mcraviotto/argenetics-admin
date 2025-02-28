@@ -8,7 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import MultipleSelector from "@/components/ui/multiselect";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newDoctorSchema, newMedicalInstitutionSchema } from "@/schemas/auth";
 import { useCreateDoctorMutation } from "@/services/doctors";
@@ -21,6 +20,7 @@ import { useState } from "react";
 import { Button as AriaButton, Popover as AriaPopover, DatePicker, Dialog, Group, I18nProvider, Label } from "react-aria-components";
 import { useForm } from "react-hook-form";
 import * as RPNInput from "react-phone-number-input";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const adaptedNewInstitutionSchema = newMedicalInstitutionSchema.omit({ password: true }).extend({
@@ -29,8 +29,6 @@ const adaptedNewInstitutionSchema = newMedicalInstitutionSchema.omit({ password:
 
 export default function NewDoctorPage() {
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const [createInstitution, { isLoading }] = useCreateInstitutionMutation();
 
@@ -53,16 +51,19 @@ export default function NewDoctorPage() {
 
       router.push("/views/medical-institutions")
 
-      toast({
-        title: "Centro médico creado",
-        description: "El centro médico ha sido creado exitosamente",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
+          <p className="font-medium">Centro médico creado</p>
+          <p className="text-sm">El centro médico ha sido creado exitosamente</p>
+        </div>
+      ))
     } catch (err: any) {
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: 'data' in err ? err.data.error : "Por favor, intenta de nuevo",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 

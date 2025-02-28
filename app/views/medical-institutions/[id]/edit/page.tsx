@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newMedicalInstitutionSchema } from "@/schemas/auth";
 import { useGetInstitutionQuery, useUpdateInstitutionMutation } from "@/services/institutions";
@@ -16,6 +15,7 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as RPNInput from "react-phone-number-input";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const editInstitutionSchema = newMedicalInstitutionSchema.omit({
@@ -28,8 +28,6 @@ const editInstitutionSchema = newMedicalInstitutionSchema.omit({
 export default function EditInstitutionPage() {
   const params = useParams<{ id: string }>()
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const { data: institution, isLoading: isInstitutionLoading } = useGetInstitutionQuery(params.id)
 
@@ -55,19 +53,22 @@ export default function EditInstitutionPage() {
         id: params.id,
       }).unwrap()
 
-      toast({
-        title: "Institución actualizada",
-        description: "Los datos de la institución han sido actualizados correctamente",
-      });
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
+          <p className="font-medium">Institución actualizada</p>
+          <p className="text-sm">Los datos de la institución han sido actualizados correctamente</p>
+        </div>
+      ))
 
       router.push(`/views/medical-institutions/${params.id}`)
     } catch (err: any) {
       console.error(err)
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: err.data.error || "Ocurrió un error al actualizar la institución",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 

@@ -1,9 +1,9 @@
-import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import { ViewTransitions } from 'next-view-transitions';
 import localFont from "next/font/local";
 import "./globals.css";
 import StoreProvider from "./store-provider";
+import { Toaster } from "sonner";
 
 const publicSans = localFont({
   src: "./fonts/PublicSans-VariableFont_wght.ttf",
@@ -12,7 +12,7 @@ const publicSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Argenetics - Panel de administración",
+  title: "Portal Argenetics - Panel de administración",
   description: "Panel de administración de Argenetics",
 };
 

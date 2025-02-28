@@ -10,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newPatientSchema } from "@/schemas/auth";
 import { useUserQuery } from "@/services/auth";
@@ -22,6 +21,7 @@ import { Link, useTransitionRouter } from "next-view-transitions";
 import { Button as AriaButton, Popover as AriaPopover, DatePicker, Dialog, Group, I18nProvider, Label } from "react-aria-components";
 import { useForm } from "react-hook-form";
 import * as RPNInput from "react-phone-number-input";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const adaptedNewPatientSchema = newPatientSchema.omit({
@@ -32,8 +32,6 @@ const adaptedNewPatientSchema = newPatientSchema.omit({
 
 export default function NewPatientPage() {
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const [createPatient, { isLoading }] = useCreatePatientMutation();
   const { data: user, isLoading: isUserLoading } = useUserQuery()
@@ -47,6 +45,7 @@ export default function NewPatientPage() {
       email: "",
       identification_number: "",
       phone_number: "",
+      state: "",
     },
   })
 
@@ -59,16 +58,19 @@ export default function NewPatientPage() {
 
       router.push("/views/patients")
 
-      toast({
-        title: "Paciente creado",
-        description: "El paciente ha sido creado exitosamente",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
+          <p className="font-medium">Paciente creado</p>
+          <p className="text-sm">El paciente ha sido creado exitosamente</p>
+        </div>
+      ))
     } catch (err: any) {
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: 'data' in err ? err.data.error : "Por favor, intenta de nuevo",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 
@@ -164,8 +166,9 @@ export default function NewPatientPage() {
                   <FormControl>
                     <Input
                       id="identification_number"
-                      type="identification_number"
+                      type="text"
                       placeholder="123456789"
+                      autoComplete="off"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />
@@ -297,7 +300,7 @@ export default function NewPatientPage() {
                                 value={states.label}
                                 key={states.value}
                                 onSelect={() => {
-                                  form.setValue("state", states.value)
+                                  form.setValue("state", states.value, { shouldValidate: true });
                                 }}
                               >
                                 {states.label}
@@ -375,7 +378,7 @@ export default function NewPatientPage() {
                 </FormItem>
               )}
             />
-            {user?.userable_type !== 'Doctor' && (
+            {user?.userable_type === 'Administrator' && (
               <FormField
                 control={form.control}
                 name="patient_state"

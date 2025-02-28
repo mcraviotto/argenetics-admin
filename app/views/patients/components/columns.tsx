@@ -41,15 +41,16 @@ function RowActions({ row }: { row: Row<ListPatient> }) {
               <span>Ver detalles</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              disabled={user?.userable_type !== "Administrator"}
-              onClick={() => router.push(`/views/patients/${row.original.id}/edit`)}
-            >
-              <SquarePen />
-              <span>Editar</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+          {user?.userable_type === "Administrator" && (
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => router.push(`/views/patients/${row.original.id}/edit`)}
+              >
+                <SquarePen />
+                <span>Editar</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </TooltipProvider>

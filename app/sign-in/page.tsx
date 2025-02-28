@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { signInSchema } from "@/schemas/auth"
 import { useSignInMutation } from "@/services/auth"
@@ -22,12 +21,12 @@ import { Eye, EyeOff } from "lucide-react"
 import { useTransitionRouter } from "next-view-transitions"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { z } from "zod"
 
 export default function SignIn() {
   const router = useTransitionRouter()
 
-  const { toast } = useToast()
   const [authUser, { isLoading }] = useSignInMutation();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -53,11 +52,12 @@ export default function SignIn() {
       router.push("/views")
       store.dispatch(api.util.resetApiState());
     } catch (err: any) {
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: 'data' in err ? err.data.message : "Por favor, intenta de nuevo",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 

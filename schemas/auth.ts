@@ -69,7 +69,7 @@ export const signInSchema = z.object({
 export const userSchema = z.object({
   id: z.string(),
   email: z.string(),
-  userable_type: z.enum(["Administrator", "Patient", "Institution", "Doctor"]),
+  userable_type: z.enum(["Administrator", "Patient", "MedicalInstitution", "Doctor"]),
   state: z.enum(["active", "pending", "rejected"]),
   confirmed: z.boolean(),
   userable: z.object({

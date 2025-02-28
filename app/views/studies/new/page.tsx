@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newStudySchema } from "@/schemas/studies";
 import { useUserQuery } from "@/services/auth";
@@ -20,6 +19,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { study_options } from "../data";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 const createAdaptedNewStudySchema = (userableType: string) =>
   newStudySchema
@@ -36,7 +36,19 @@ const createAdaptedNewStudySchema = (userableType: string) =>
       additional_docs: z.instanceof(File).optional(),
     })
     .superRefine((data, ctx) => {
-      if (userableType === "Patient" || userableType === "Doctor") {
+      if (userableType === "MedicalInstitution") {
+        if (!data.medical_order) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "La orden médica es requerida",
+            path: ["medical_order"],
+          });
+        }
+      } else if (
+        userableType === "Patient" ||
+        userableType === "Doctor" ||
+        userableType === "Administrator"
+      ) {
         if (!data.medical_order) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -53,13 +65,18 @@ const createAdaptedNewStudySchema = (userableType: string) =>
           });
         }
       }
-    });
 
+      if (data.title === "prosigna" && !data.additional_docs) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Los documentos adicionales son requeridos para estudios prosigna",
+          path: ["additional_docs"],
+        });
+      }
+    });
 
 export default function NewStudyPage() {
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const { data: patients } = useGetAllPatientsQuery()
   const { data: doctors } = useGetAllDoctorsQuery()
@@ -79,7 +96,6 @@ export default function NewStudyPage() {
   })
 
   async function onSubmit(values: z.infer<typeof adaptedSchema>) {
-    console.log(values)
     try {
       const { result, medical_order, additional_docs, study_category_id, ...data } = values
 
@@ -94,19 +110,21 @@ export default function NewStudyPage() {
         additional_docs_storage_ref,
       }).unwrap()
 
-      toast({
-        title: "Estudio creado",
-        description: "El estudio ha sido creado exitosamente",
-      });
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
+          <p className="font-medium">Estudio creado</p>
+          <p className="text-sm">El estudio ha sido creado exitosamente</p>
+        </div>
+      ))
 
       router.push(`/views/studies`)
     } catch (err: any) {
-      console.error(err)
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: err.data.error || "Ocurrió un error al crear el estudio",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 
@@ -395,8 +413,8 @@ export default function NewStudyPage() {
                             <CommandGroup>
                               {doctors?.map((doctor) => (
                                 <CommandItem
-                                  value={doctor.id}
                                   key={doctor.id}
+                                  value={doctor.name}
                                   onSelect={() => {
                                     form.setValue("doctor_id", doctor.id)
                                   }}
@@ -463,7 +481,7 @@ export default function NewStudyPage() {
                 </FormItem>
               )}
             />
-            {user?.userable_type !== "Patient" && user?.userable_type !== "Doctor" && (
+            {user?.userable_type !== "Patient" && user?.userable_type !== "Doctor" && user?.userable_type !== "MedicalInstitution" && (
               <FormField
                 control={form.control}
                 name="result"
@@ -529,7 +547,10 @@ export default function NewStudyPage() {
                           type="button"
                           size="icon"
                           onClick={() => {
-                            form.setValue("additional_docs", undefined, { shouldValidate: true })
+                            form.reset({
+                              ...form.getValues(),
+                              additional_docs: undefined,
+                            })
                           }}
                         >
                           <X />

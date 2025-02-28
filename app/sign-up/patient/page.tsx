@@ -23,13 +23,11 @@ import { CountrySelect, FlagComponent, PhoneInput } from "@/components/phone-inp
 import { useState } from "react";
 import { useSignUpMutation } from "@/services/auth";
 import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
 import Cookies from 'js-cookie'
+import { toast } from "sonner";
 
 export default function PatientRegisterPage() {
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -62,11 +60,12 @@ export default function PatientRegisterPage() {
 
       router.push("/")
     } catch (err: any) {
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: 'data' in err ? err.data.error : "Por favor, intenta de nuevo",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 
@@ -181,8 +180,9 @@ export default function PatientRegisterPage() {
                   <FormControl>
                     <Input
                       id="identification_number"
-                      type="identification_number"
+                      type="text"
                       placeholder="123456789"
+                      autoComplete="off"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

@@ -10,10 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newPatientSchema } from "@/schemas/auth";
-import { useUpdateDoctorMutation } from "@/services/doctors";
 import { useGetPatientQuery, useUpdatePatientMutation } from "@/services/patients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
@@ -25,6 +23,7 @@ import { useEffect } from "react";
 import { Button as AriaButton, Popover as AriaPopover, DatePicker, Dialog, Group, I18nProvider, Label } from "react-aria-components";
 import { useForm } from "react-hook-form";
 import * as RPNInput from "react-phone-number-input";
+import { toast } from "sonner";
 import { z } from "zod";
 
 function formatDateToISO(dateStr: string) {
@@ -43,8 +42,6 @@ const editPatientSchema = newPatientSchema.omit({
 export default function EditPatientPage() {
   const params = useParams<{ id: string }>()
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const { data: patient, isLoading: isPatientLoading } = useGetPatientQuery(params.id)
 
@@ -74,19 +71,22 @@ export default function EditPatientPage() {
         birth_date: formattedBirthDay,
       }).unwrap()
 
-      toast({
-        title: "Paciente actualizado",
-        description: "Los datos del paciente han sido actualizados correctamente",
-      });
+
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
+          <p className="font-medium">Paciente actualizado</p>
+          <p className="text-sm">Los datos del paciente han sido actualizados correctamente</p>
+        </div>
+      ))
 
       router.push(`/views/patients/${params.id}`)
     } catch (err: any) {
-      console.error(err)
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: err.data.error || "Ocurrió un error al actualizar el doctor",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 
@@ -199,8 +199,9 @@ export default function EditPatientPage() {
                   <FormControl>
                     <Input
                       id="identification_number"
-                      type="identification_number"
+                      type="text"
                       placeholder="123456789"
+                      autoComplete="off"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

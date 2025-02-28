@@ -22,8 +22,8 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useVerifyTokenMutation } from "@/services/auth";
-import { useToast } from "@/hooks/use-toast";
 import { useTransitionRouter } from "next-view-transitions";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   token: z.string().min(6, {
@@ -32,8 +32,6 @@ const FormSchema = z.object({
 })
 
 export default function OtpPage() {
-  const { toast } = useToast()
-
   const router = useTransitionRouter()
 
   const [verifyToken, { isLoading }] = useVerifyTokenMutation()
@@ -50,12 +48,12 @@ export default function OtpPage() {
       await verifyToken({ token: data.token }).unwrap()
       router.push("/views")
     } catch (err: any) {
-      console.log(err)
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: 'data' in err ? err.data.error : "Por favor, intenta de nuevo",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 

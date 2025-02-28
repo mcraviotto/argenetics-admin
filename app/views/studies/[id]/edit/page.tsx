@@ -6,7 +6,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newStudySchema } from "@/schemas/studies";
 import { useGetAllDoctorsQuery } from "@/services/doctors";
@@ -22,6 +21,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { study_options } from "../../data";
 import { formatReference } from "../../utils";
+import { toast } from "sonner";
 
 const editStudySchema = newStudySchema
   .omit({
@@ -60,8 +60,6 @@ export default function EditStudyPage() {
   const params = useParams<{ id: string }>()
   const router = useTransitionRouter();
 
-  const { toast } = useToast()
-
   const { data: study, isLoading: isStudyLoading } = useGetStudyQuery(params.id)
   const { data: patients } = useGetAllPatientsQuery()
   const { data: doctors } = useGetAllDoctorsQuery()
@@ -95,19 +93,21 @@ export default function EditStudyPage() {
         additional_docs_storage_ref,
       }).unwrap()
 
-      toast({
-        title: "Estudio actualizado",
-        description: "Los datos del estudio han sido actualizados correctamente",
-      });
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
+          <p className="font-medium">Estudio actualizado</p>
+          <p className="text-sm">Los datos del estudio han sido actualizados correctamente</p>
+        </div>
+      ))
 
       router.push(`/views/studies/${params.id}`)
     } catch (err: any) {
-      console.error(err)
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: err.data.error || "Ocurrió un error al actualizar el estudio",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 

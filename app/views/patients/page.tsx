@@ -286,7 +286,7 @@ export default function PatientsPage() {
                 <TableCell colSpan={columns.length}>
                   <div className="flex flex-col items-center justify-center text-muted-foreground absolute inset-0">
                     <DnaOff className="w-8 h-8" />
-                    <p className="text-center">No se encontraron estudios.</p>
+                    <p className="text-center">No se encontraron pacientes.</p>
                   </div>
                 </TableCell>
               </TableRow>

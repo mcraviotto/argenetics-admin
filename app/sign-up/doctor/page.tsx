@@ -8,7 +8,6 @@ import { DateInput } from "@/components/ui/datefield-rac";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { newDoctorSchema } from "@/schemas/auth";
 import { useSignUpMutation } from "@/services/auth";
@@ -21,12 +20,11 @@ import { useState } from "react";
 import { Button as AriaButton, Popover as AriaPopover, DatePicker, Dialog, Group, I18nProvider, Label } from "react-aria-components";
 import { useForm } from "react-hook-form";
 import * as RPNInput from "react-phone-number-input";
+import { toast } from "sonner";
 import { z } from "zod";
 
 export default function DoctorRegisterPage() {
   const router = useTransitionRouter();
-
-  const { toast } = useToast()
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -58,11 +56,12 @@ export default function DoctorRegisterPage() {
 
       router.push("/")
     } catch (err: any) {
-      toast({
-        title: "Algo salió mal",
-        variant: "destructive",
-        description: 'data' in err ? err.data.error : "Por favor, intenta de nuevo",
-      })
+      toast.custom((t) => (
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+          <p className="font-medium">Algo salió mal</p>
+          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+        </div>
+      ))
     }
   }
 
@@ -177,8 +176,9 @@ export default function DoctorRegisterPage() {
                   <FormControl>
                     <Input
                       id="identification_number"
-                      type="identification_number"
+                      type="text"
                       placeholder="123456789"
+                      autoComplete="off"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

@@ -75,17 +75,11 @@ export default function MedicalInstitutionsPage() {
     state: filters?.state === "all" ? "" : filters?.state
   });
 
-  const [sorting, setSorting] = useState<SortingState>([{
-    id: "name",
-    desc: false,
-  }]);
-
   const table = useReactTable({
     data: institutions?.data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
     enableSortingRemoval: false,
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
@@ -96,7 +90,6 @@ export default function MedicalInstitutionsPage() {
     rowCount: institutions?.total_elements ?? 0,
     manualPagination: true,
     state: {
-      sorting,
       pagination,
       columnFilters,
       columnVisibility,
@@ -225,7 +218,7 @@ export default function MedicalInstitutionsPage() {
                 <TableCell colSpan={columns.length}>
                   <div className="flex flex-col items-center justify-center text-muted-foreground absolute inset-0">
                     <DnaOff className="w-8 h-8" />
-                    <p className="text-center">No se encontraron estudios.</p>
+                    <p className="text-center">No se encontraron instituciones médicas.</p>
                   </div>
                 </TableCell>
               </TableRow>
