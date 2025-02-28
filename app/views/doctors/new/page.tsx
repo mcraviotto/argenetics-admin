@@ -23,7 +23,7 @@ import * as RPNInput from "react-phone-number-input";
 import { toast } from "sonner";
 import { z } from "zod";
 
-export const createAdaptedNewDoctorSchema = (userableType: string) =>
+const createAdaptedNewDoctorSchema = (userableType: string) =>
   newDoctorSchema
     .omit({ password: true })
     .extend({
