@@ -205,7 +205,7 @@ export default function EditDoctorPage() {
                       id="identification_number"
                       type="text"
                       placeholder="123456789"
-                      autoComplete="off"
+                      autoComplete="new-password"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

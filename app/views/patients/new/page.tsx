@@ -168,7 +168,7 @@ export default function NewPatientPage() {
                       id="identification_number"
                       type="text"
                       placeholder="123456789"
-                      autoComplete="off"
+                      autoComplete="new-password"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />
@@ -338,7 +338,7 @@ export default function NewPatientPage() {
                     <Input
                       id="city"
                       type="city"
-                      placeholder="Lanús"
+                      placeholder="Ciudad"
                       className={cn(form.formState.errors.city && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

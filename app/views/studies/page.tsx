@@ -181,9 +181,20 @@ export default function StudiesPage() {
         {user?.userable_type === "Patient" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
             {(!studies?.data?.length && !isLoadingStudies) && (
-              <div className="flex flex-col items-center justify-center col-span-full inset-0 text-muted-foreground gap-2 absolute">
-                <DnaOff className="w-7 h-7" />
-                <p className="text-center text-sm">No se encontraron estudios.</p>
+              <div className="flex flex-col items-center justify-center col-span-full inset-0 text-muted-foreground gap-6 absolute">
+                <div>
+                  <span className="font-semibold">No tenés estudios disponibles</span>
+                  <p className="text-center text-sm">Comenzá a solicitarlos acá</p>
+                </div>
+                <div className="p-6 bg-primary/25 rounded-full border-primary shadow-lg shadow-primary/25">
+                  <FilePlus2 className="w-7 h-7 text-primary" />
+                </div>
+                <Button size="sm" className="w-full xl:w-auto" asChild>
+                  <Link href="/views/studies/new">
+                    <Plus />
+                    Solicitar nuevo estudio
+                  </Link>
+                </Button>
               </div>
             )}
             {studies?.data?.map((study) => (

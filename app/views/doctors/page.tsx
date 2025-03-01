@@ -37,6 +37,7 @@ import { Link } from 'next-view-transitions';
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import { columns } from "./components/columns";
+import { useUserQuery } from "@/services/auth";
 
 type Filters = {
   medical_institution_id: string;
@@ -57,6 +58,7 @@ export default function DoctorsPage() {
     state: ""
   });
 
+  const { data: user, isLoading: isUserLoading } = useUserQuery();
   const { data: institutions } = useGetAllInstitutionsQuery({ query: "" });
   const { data: doctors, isLoading: isLoadingDoctors } = useListDoctorsQuery({
     page: pagination.pageIndex + 1,
@@ -93,7 +95,13 @@ export default function DoctorsPage() {
       <h1 className="text-xl font-medium mb-3">
         Médicos
       </h1>
-      <div className="overflow-hidden rounded-sm bg-background shadow-md h-full flex flex-col">
+      <div
+        className={cn(
+          "relative overflow-auto rounded-sm bg-background shadow-md h-full flex flex-col transition-all",
+          user?.userable_type === "Patient" && "bg-transparent border-none shadow-none pb-4 pr-2",
+          isUserLoading && "blur-sm"
+        )}
+      >
         <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 bg-background p-4 shadow-md border-b">
           <div className="flex flex-col xl:flex-row items-start xl:items-center gap-4 w-full">
             <div className="relative w-full xl:w-[400px]">
@@ -208,7 +216,7 @@ export default function DoctorsPage() {
         </div>
         <DataTable
           data={doctors?.data ?? []}
-          columns={columns}
+          columns={user?.userable_type === "MedicalInstitution" ? columns.filter((col) => col.header !== "Centro médico") : columns}
           renderLoadingCell={renderLoadingCell}
           loading={isLoadingDoctors}
           pagination={pagination}

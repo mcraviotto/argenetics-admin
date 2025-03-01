@@ -17,9 +17,12 @@ import {
 import { Ellipsis, Eye, SquarePen } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { doctor_status_adapter } from "../utils";
+import { useUserQuery } from "@/services/auth";
 
 function RowActions({ row }: { row: Row<ListDoctor> }) {
   const router = useTransitionRouter()
+
+  const { data: user } = useUserQuery();
 
   return (
     <TooltipProvider delayDuration={1000}>
@@ -38,14 +41,16 @@ function RowActions({ row }: { row: Row<ListDoctor> }) {
               <span>Ver detalles</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => router.push(`/views/doctors/${row.original.id}/edit`)}
-            >
-              <SquarePen />
-              <span>Editar</span>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+          {user?.userable_type === "Administrator" && (
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => router.push(`/views/doctors/${row.original.id}/edit`)}
+              >
+                <SquarePen />
+                <span>Editar</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </TooltipProvider>
@@ -84,7 +89,6 @@ export const columns: ColumnDef<ListDoctor>[] = [
       const institutions = row.original.medical_institutions;
       const displayInstitutions = institutions.slice(0, 2);
       const extraCount = institutions.length - displayInstitutions.length;
-
       return (
         <div className="flex flex-wrap gap-2">
           {displayInstitutions.map((institution) => (

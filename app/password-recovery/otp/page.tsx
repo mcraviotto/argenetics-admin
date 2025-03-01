@@ -21,11 +21,11 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useUpdatePasswordMutation, useVerifyTokenMutation } from "@/services/auth";
-import { useTransitionRouter } from "next-view-transitions";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Eye, EyeOffIcon } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, EyeOffIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
@@ -90,8 +90,20 @@ export default function OtpPage() {
 
   return (
     <div className={cn("flex flex-col gap-6 w-full")}>
-      <Card className="shadow-lg shadow-border p-6 border-none">
+      <Card className="shadow-lg shadow-border p-6 border-none relative">
         <CardHeader className="text-center">
+          <Button
+            variant="link"
+            className="px-2 absolute top-2 left-4"
+            type="button"
+            disableRipple
+            asChild
+          >
+            <Link href="/password-recovery">
+              <ArrowLeft />
+              Volver
+            </Link>
+          </Button>
           <CardTitle className="text-2xl font-medium">
             Recuperar contraseña
           </CardTitle>
@@ -127,13 +139,12 @@ export default function OtpPage() {
                 name="new_password"
                 render={({ field }) => (
                   <FormItem className="flex flex-col w-full">
-
                     <FormControl>
                       <div className="relative">
                         <Input
-                          id="new_password"
-                          type={isVisible ? "text" : "new_password"}
-                          placeholder="Ingresá tu nueva contraseña"
+                          id="password"
+                          type={isVisible ? "text" : "password"}
+                          placeholder="•••••••••••"
                           className={cn(form.formState.errors.new_password && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                           {...field}
                         />
@@ -142,12 +153,12 @@ export default function OtpPage() {
                           variant="ghost"
                           type="button"
                           onClick={toggleVisibility}
-                          aria-label={isVisible ? "Hide new_password" : "Show new_password"}
+                          aria-label={isVisible ? "Hide password" : "Show password"}
                           aria-pressed={isVisible}
-                          aria-controls="new_password"
+                          aria-controls="password"
                         >
                           {isVisible ? (
-                            <EyeOffIcon size={16} strokeWidth={2} aria-hidden="true" />
+                            <EyeOff size={16} strokeWidth={2} aria-hidden="true" />
                           ) : (
                             <Eye size={16} strokeWidth={2} aria-hidden="true" />
                           )}

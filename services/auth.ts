@@ -52,4 +52,5 @@ export const {
   useVerifyTokenMutation,
   useSendRecoveryEmailMutation,
   useUpdatePasswordMutation,
+  useLazyUserQuery
 } = authApi

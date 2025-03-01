@@ -5,21 +5,20 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ListStudy } from "@/schemas/studies";
+import { useUserQuery } from "@/services/auth";
 import {
   ColumnDef,
   Row
 } from "@tanstack/react-table";
-import { Ellipsis, Eye, FileDownIcon, LucideBookDown, SquarePen } from "lucide-react";
+import { Ellipsis, Eye, SquarePen } from "lucide-react";
 import { Link, useTransitionRouter } from "next-view-transitions";
-import { study_status_adapter } from "../utils";
 import { study_options } from "../data";
-import { useUserQuery } from "@/services/auth";
+import { study_status_adapter } from "../utils";
 
 function RowActions({ row }: { row: Row<ListStudy> }) {
   const router = useTransitionRouter()

@@ -201,7 +201,7 @@ export default function EditPatientPage() {
                       id="identification_number"
                       type="text"
                       placeholder="123456789"
-                      autoComplete="off"
+                      autoComplete="new-password"
                       className={cn(form.formState.errors.identification_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />
@@ -333,7 +333,7 @@ export default function EditPatientPage() {
                                 value={states.label}
                                 key={states.value}
                                 onSelect={() => {
-                                  form.setValue("state", states.value)
+                                  form.setValue("state", states.value, { shouldValidate: true })
                                 }}
                               >
                                 {states.label}
@@ -371,7 +371,7 @@ export default function EditPatientPage() {
                     <Input
                       id="city"
                       type="city"
-                      placeholder="Lanús"
+                      placeholder="Ciudad"
                       className={cn(form.formState.errors.city && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

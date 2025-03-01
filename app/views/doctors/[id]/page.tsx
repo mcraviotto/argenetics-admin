@@ -8,11 +8,13 @@ import { ArrowLeft, Edit } from "lucide-react";
 import { Link } from "next-view-transitions";
 import { useParams } from "next/navigation";
 import { doctor_speciality_adapter, doctor_status_adapter } from "../utils";
+import { useUserQuery } from "@/services/auth";
 
 export default function DoctorPage() {
   const params = useParams<{ id: string }>()
 
   const { data: doctor, isLoading } = useGetDoctorQuery(params.id)
+  const { data: user } = useUserQuery();
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -73,12 +75,14 @@ export default function DoctorPage() {
               {!doctor ? placeholder(10) : doctor_speciality_adapter[doctor.specialty as keyof typeof doctor_speciality_adapter] ?? ""}
             </span>
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-muted-foreground text-sm">Centros médicos</label>
-            <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
-              {!doctor ? placeholder(13) : doctor.medical_institutions.length > 0 ? doctor.medical_institutions.map((institution) => institution.name).join(", ") : "No asignado"}
-            </span>
-          </div>
+          {user?.userable_type !== "MedicalInstitution" &&
+            <div className="flex flex-col gap-1">
+              <label className="text-muted-foreground text-sm">Centros médicos</label>
+              <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
+                {!doctor ? placeholder(13) : doctor.medical_institutions.length > 0 ? doctor.medical_institutions.map((institution) => institution.name).join(", ") : "No asignado"}
+              </span>
+            </div>
+          }
           <div className="flex flex-col gap-1">
             <label className="text-muted-foreground text-sm">Estado</label>
             <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
@@ -100,14 +104,16 @@ export default function DoctorPage() {
               Volver
             </Link>
           </Button>
-          <Button
-            asChild
-          >
-            <Link href={`/views/doctors/${params.id}/edit`}>
-              <Edit />
-              Editar
-            </Link>
-          </Button>
+          {user?.userable_type === "Administrator" &&
+            <Button
+              asChild
+            >
+              <Link href={`/views/doctors/${params.id}/edit`}>
+                <Edit />
+                Editar
+              </Link>
+            </Button>
+          }
         </div>
       </div>
     </div>

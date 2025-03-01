@@ -104,13 +104,14 @@ export default function PatientPage() {
               Volver
             </Link>
           </Button>
-          <Button
-            onClick={() => router.push(`/views/patients/${params.id}/edit`)}
-            disabled={user?.userable_type !== "Administrator"}
-          >
-            <Edit />
-            Editar
-          </Button>
+          {user?.userable_type === "Administrator" &&
+            <Button
+              onClick={() => router.push(`/views/patients/${params.id}/edit`)}
+            >
+              <Edit />
+              Editar
+            </Button>
+          }
         </div>
       </div>
     </div>

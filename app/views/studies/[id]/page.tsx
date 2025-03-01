@@ -180,13 +180,14 @@ export default function StudyPage() {
               Volver
             </Link>
           </Button>
-          <Button
-            disabled={user?.userable_type !== "Administrator"}
-            onClick={() => router.push(`/views/studies/${params.id}/edit`)}
-          >
-            <Edit />
-            Editar
-          </Button>
+          {user?.userable_type === "Administrator" &&
+            <Button
+              onClick={() => router.push(`/views/studies/${params.id}/edit`)}
+            >
+              <Edit />
+              Editar
+            </Button>
+          }
         </div>
       </div>
     </div>

@@ -1,33 +1,26 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage
 } from "@/components/ui/form";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { useSendRecoveryEmailMutation, useVerifyTokenMutation } from "@/services/auth";
-import { useTransitionRouter } from "next-view-transitions";
-import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { useSendRecoveryEmailMutation } from "@/services/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft } from "lucide-react";
+import { Link, useTransitionRouter } from "next-view-transitions";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const FormSchema = z.object({
-  email: z.string().min(1, {
-    message: "El email es requerido",
-  }),
+  email: z.string().min(1, { message: "El email es requerido" }),
 })
 
 export default function PasswordRecoveryPage() {
@@ -58,8 +51,20 @@ export default function PasswordRecoveryPage() {
 
   return (
     <div className={cn("flex flex-col gap-6 w-full")}>
-      <Card className="shadow-lg shadow-border p-6 border-none">
+      <Card className="shadow-lg shadow-border p-6 border-none relative">
         <CardHeader className="text-center">
+          <Button
+            variant="link"
+            className="px-2 absolute top-2 left-4"
+            type="button"
+            disableRipple
+            asChild
+          >
+            <Link href="/sign-in">
+              <ArrowLeft />
+              Volver
+            </Link>
+          </Button>
           <CardTitle className="text-2xl font-medium">
             Recuperar contraseña
           </CardTitle>
@@ -81,7 +86,6 @@ export default function PasswordRecoveryPage() {
                         type="email"
                         placeholder="m@example.com"
                         className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25", "w-full")}
-                        required
                         {...field}
                       />
                     </FormControl>

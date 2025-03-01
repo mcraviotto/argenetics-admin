@@ -58,7 +58,6 @@ export default async function authMiddleware(request: NextRequest) {
   }
 
   if (!sessionToken) {
-    console.log("No session token");
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 

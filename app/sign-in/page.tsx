@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { signInSchema } from "@/schemas/auth"
-import { useSignInMutation } from "@/services/auth"
+import { useLazyUserQuery, useSignInMutation } from "@/services/auth"
 import { store } from "@/store"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Cookies from 'js-cookie'
@@ -28,6 +28,7 @@ export default function SignIn() {
   const router = useTransitionRouter()
 
   const [authUser, { isLoading }] = useSignInMutation();
+  const [getUser] = useLazyUserQuery();
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -49,13 +50,15 @@ export default function SignIn() {
         Cookies.set('sessionToken', response.token);
       }
 
+      await getUser().unwrap()
+
       router.push("/views")
       store.dispatch(api.util.resetApiState());
     } catch (err: any) {
       toast.custom((t) => (
         <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
-          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+          <p className="text-sm">{err.data.message || err.data.error || "Ocurrió un error inesperado"}</p>
         </div>
       ))
     }
