@@ -41,4 +41,5 @@ export const {
   useLazyDownloadStudyQuery,
   useUpdateStudyMutation,
   useCreateStudyMutation,
+  useLazyGetStudyQuery
 } = studiesApi;

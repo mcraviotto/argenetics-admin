@@ -1,42 +1,20 @@
 "use client";
 
+import DataTable from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { useListPatientsQuery } from "@/services/patients";
 import {
-  ColumnFiltersState,
-  PaginationState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable
+  PaginationState
 } from "@tanstack/react-table";
 import {
-  ChevronFirst,
-  ChevronLast,
-  ChevronLeft,
-  ChevronRight,
-  DnaOff,
   Plus,
-  Search
+  Search,
+  UserRoundPlus
 } from "lucide-react";
 import { Link } from 'next-view-transitions';
 import { useState } from "react";
@@ -53,8 +31,6 @@ export default function PatientsPage() {
 
   const [debouncedSearchFilter] = useDebounce(searchFilter, 500);
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -70,34 +46,6 @@ export default function PatientsPage() {
     medical_institution_id: filters?.medical_institution_id ?? "",
     query: debouncedSearchFilter ?? "",
     state: filters?.state === "all" ? "" : filters?.state
-  });
-
-  const [sorting, setSorting] = useState<SortingState>([{
-    id: "name",
-    desc: false,
-  }]);
-
-  const table = useReactTable({
-    data: patients?.data ?? [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    enableSortingRemoval: false,
-    getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    getFilteredRowModel: getFilteredRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    rowCount: patients?.total_elements ?? 0,
-    manualPagination: true,
-    state: {
-      sorting,
-      pagination,
-      columnFilters,
-      columnVisibility,
-    },
   });
 
   const renderLoadingCell = (colIndex: number) => {
@@ -239,134 +187,21 @@ export default function PatientsPage() {
             </Button>
           </div>
         </div>
-        <Table className="border-separate border-spacing-0 [&_td]:border-border [&_tfoot_td]:border-t [&_th]:border-b [&_th]:border-border [&_tr:not(:last-child)_td]:border-b [&_tr]:border-none">
-          <TableHeader className="sticky top-0 z-10 bg-background/90 backdrop-blur-sm">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
-                    >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="h-full">
-            {isLoadingPatients ? (
-              Array.from({ length: 20 }).map((_, index) => (
-                <TableRow key={`loading-${index}`}>
-                  {columns.map((_, colIndex) => (
-                    <TableCell
-                      key={`loading-${index}-${colIndex}`}
-                      className="last:py-0 last:text-right h-[55px]"
-                    >
-                      {renderLoadingCell(colIndex)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="last:py-0">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={columns.length}>
-                  <div className="flex flex-col items-center justify-center text-muted-foreground absolute inset-0">
-                    <DnaOff className="w-8 h-8" />
-                    <p className="text-center">No se encontraron pacientes.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <div className="flex items-center justify-between gap-8 bg-background p-4 rounded-b-sm border-t mt-auto">
-          <div className="flex grow justify-start whitespace-nowrap text-sm text-muted-foreground">
-            <p className="whitespace-nowrap text-sm text-muted-foreground" aria-live="polite">
-              Mostrando{" "}
-              <span className="text-foreground">
-                {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
-                {Math.min(
-                  Math.max(
-                    table.getState().pagination.pageIndex * table.getState().pagination.pageSize +
-                    table.getState().pagination.pageSize,
-                    0,
-                  ),
-                  table.getRowCount(),
-                )}
-              </span>{" "}
-              de{" "}<span className="text-foreground">{table.getRowCount().toString()}</span>
-              {" "}resultados
-            </p>
-          </div>
-          <div>
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.firstPage()}
-                    disabled={!table.getCanPreviousPage()}
-                    aria-label="Go to first page"
-                  >
-                    <ChevronFirst size={16} strokeWidth={2} aria-hidden="true" />
-                  </Button>
-                </PaginationItem>
-                <PaginationItem>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                    aria-label="Go to previous page"
-                  >
-                    <ChevronLeft size={16} strokeWidth={2} aria-hidden="true" />
-                  </Button>
-                </PaginationItem>
-                <PaginationItem>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                    aria-label="Go to next page"
-                  >
-                    <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
-                  </Button>
-                </PaginationItem>
-                <PaginationItem>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="disabled:pointer-events-none disabled:opacity-50"
-                    onClick={() => table.lastPage()}
-                    disabled={!table.getCanNextPage()}
-                    aria-label="Go to last page"
-                  >
-                    <ChevronLast size={16} strokeWidth={2} aria-hidden="true" />
-                  </Button>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        </div>
+        <DataTable
+          data={patients?.data ?? []}
+          columns={columns}
+          renderLoadingCell={renderLoadingCell}
+          loading={isLoadingPatients}
+          pagination={pagination}
+          setPagination={setPagination}
+          rowCount={patients?.total_elements ?? 0}
+          emptyDataMessage={
+            <div className="flex flex-col items-center justify-center">
+              <UserRoundPlus className="w-8 h-8" />
+              <p className="text-center">No se encontraron pacientes.</p>
+            </div>
+          }
+        />
       </div>
     </div>
   );

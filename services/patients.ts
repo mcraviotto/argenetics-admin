@@ -42,5 +42,6 @@ export const {
   useGetPatientQuery,
   useUpdatePatientMutation,
   useCreatePatientMutation,
-  useGetAllPatientsQuery
+  useGetAllPatientsQuery,
+  useLazyGetPatientQuery
 } = patientsApi

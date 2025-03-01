@@ -11,8 +11,8 @@ export const doctorsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Doctors'],
     }),
-    listDoctors: builder.query<ListDoctorsResponse, { page?: number, medical_institution_id?: string, query: string, state?: string }>({
-      query: ({ page = 1, medical_institution_id, query, state }) => `/doctors?page=${page}&medical_institution_id=${medical_institution_id}&query=${query}&state=${state}`,
+    listDoctors: builder.query<ListDoctorsResponse, { page?: number, medical_institution_id?: string, query?: string, state?: string }>({
+      query: ({ page = 1, medical_institution_id, query = "", state = "" }) => `/doctors?page=${page}&medical_institution_id=${medical_institution_id}&query=${query}&state=${state}`,
       providesTags: ['Doctors'],
     }),
     getDoctor: builder.query<ListDoctor, string>({
@@ -40,5 +40,6 @@ export const {
   useGetDoctorQuery,
   useUpdateDoctorMutation,
   useCreateDoctorMutation,
-  useGetAllDoctorsQuery
+  useGetAllDoctorsQuery,
+  useLazyGetDoctorQuery
 } = doctorsApi

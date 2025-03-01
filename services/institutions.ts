@@ -41,4 +41,5 @@ export const {
   useGetInstitutionQuery,
   useUpdateInstitutionMutation,
   useCreateInstitutionMutation,
+  useLazyGetInstitutionQuery
 } = institutionsApi
