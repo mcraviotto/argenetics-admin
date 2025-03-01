@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Portal Argenetics - Recuperar contraseña",
@@ -9,11 +10,13 @@ export const metadata: Metadata = {
 export default function PasswordRecoveryLayout({ children }: { children: React.ReactNode }) {
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6 items-center min-w-[450px]">
-        <Image src="/argenetics-logo.webp" width={200} height={30} alt="Argenetics" priority />
-        {children}
+    <Suspense>
+      <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
+        <div className="flex w-full max-w-sm flex-col gap-6 items-center min-w-[450px]">
+          <Image src="/argenetics-logo.webp" width={200} height={30} alt="Argenetics" priority />
+          {children}
+        </div>
       </div>
-    </div>
+    </Suspense>
   )
 }
