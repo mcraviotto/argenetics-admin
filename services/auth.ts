@@ -27,6 +27,20 @@ export const authApi = api.injectEndpoints({
         body: { token },
       }),
     }),
+    sendRecoveryEmail: builder.mutation<void, { email: string }>({
+      query: ({ email }) => ({
+        url: '/users/init_reset',
+        method: 'POST',
+        body: { email },
+      }),
+    }),
+    updatePassword: builder.mutation<void, { email: string; new_password: string; code: string }>({
+      query: ({ email, new_password, code }) => ({
+        url: '/users/reset_password',
+        method: 'POST',
+        body: { email, new_password, code },
+      }),
+    }),
   }),
   overrideExisting: false,
 })
@@ -36,4 +50,6 @@ export const {
   useUserQuery,
   useSignUpMutation,
   useVerifyTokenMutation,
+  useSendRecoveryEmailMutation,
+  useUpdatePasswordMutation,
 } = authApi

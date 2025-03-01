@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,32 +19,33 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useVerifyTokenMutation } from "@/services/auth";
+import { useSendRecoveryEmailMutation, useVerifyTokenMutation } from "@/services/auth";
 import { useTransitionRouter } from "next-view-transitions";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
-  token: z.string().min(6, {
-    message: "El código debe tener al menos 6 caracteres",
+  email: z.string().min(1, {
+    message: "El email es requerido",
   }),
 })
 
-export default function OtpPage() {
+export default function PasswordRecoveryPage() {
   const router = useTransitionRouter()
 
-  const [verifyToken, { isLoading }] = useVerifyTokenMutation()
+  const [sendRecoveryEmail, { isLoading }] = useSendRecoveryEmailMutation()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      token: "",
+      email: "",
     },
   })
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      await verifyToken({ token: data.token }).unwrap()
-      router.push("/views")
+      await sendRecoveryEmail({ email: data.email }).unwrap()
+      router.push(`/password-recovery/otp?email=${data.email}`)
     } catch (err: any) {
       toast.custom((t) => (
         <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
@@ -60,29 +60,30 @@ export default function OtpPage() {
     <div className={cn("flex flex-col gap-6 w-full")}>
       <Card className="shadow-lg shadow-border p-6 border-none">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-medium">Confirmá tu cuenta</CardTitle>
-          <CardDescription className="text-sm text-neutral-500">Ingresá el código de verificación que te enviamos a tu teléfono</CardDescription>
+          <CardTitle className="text-2xl font-medium">
+            Recuperar contraseña
+          </CardTitle>
+          <CardDescription className="text-sm text-neutral-500">
+            Ingresa tu email y te enviaremos un código de recuperación
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col gap-6 items-center">
               <FormField
                 control={form.control}
-                name="token"
+                name="email"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="sr-only">One-Time Password</FormLabel>
+                  <FormItem className="flex flex-col w-full">
                     <FormControl>
-                      <InputOTP maxLength={6} {...field}>
-                        <InputOTPGroup className="flex justify-center gap-2">
-                          <InputOTPSlot className="!rounded-sm border !ring-primary" index={0} />
-                          <InputOTPSlot className="!rounded-sm border !ring-primary" index={1} />
-                          <InputOTPSlot className="!rounded-sm border !ring-primary" index={2} />
-                          <InputOTPSlot className="!rounded-sm border !ring-primary" index={3} />
-                          <InputOTPSlot className="!rounded-sm border !ring-primary" index={4} />
-                          <InputOTPSlot className="!rounded-sm border !ring-primary" index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25", "w-full")}
+                        required
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -93,7 +94,7 @@ export default function OtpPage() {
                 className="w-full"
                 loading={isLoading}
               >
-                Verificar
+                Confirmar
               </Button>
             </form>
           </Form>

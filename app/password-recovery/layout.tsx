@@ -2,11 +2,11 @@ import { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Portal Argenetics - Verificá tu cuenta",
-  description: "Verificá tu cuenta de Argenetics",
+  title: "Portal Argenetics - Recuperar contraseña",
+  description: "Recupera tu contraseña de Argenetics",
 };
 
-export default function OtpLayout({ children }: { children: React.ReactNode }) {
+export default function PasswordRecoveryLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">

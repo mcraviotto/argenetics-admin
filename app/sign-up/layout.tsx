@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Argenetics - Registrarse",
+  title: "Portal Argenetics - Registrarse",
   description: "Registrarse en Argenetics para acceder a tu cuenta",
 };
 

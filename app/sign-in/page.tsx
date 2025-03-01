@@ -145,6 +145,7 @@ export default function SignIn() {
                   variant="link"
                   type="button"
                   disableRipple
+                  onClick={() => router.push("/password-recovery")}
                 >
                   Olvidé mi contraseña
                 </Button>

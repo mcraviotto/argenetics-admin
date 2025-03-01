@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { User } from "./schemas/auth";
 
-const publicRoutes = ["/sign-in", "/sign-up/*"];
+const publicRoutes = ["/sign-in", "/sign-up/*", "/password-recovery/*"];
 
 const roleRedirects: Record<string, string> = {
   Administrator: "/views/studies",
