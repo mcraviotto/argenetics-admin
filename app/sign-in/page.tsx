@@ -89,10 +89,8 @@ export default function SignIn() {
                         <FormControl>
                           <Input
                             id="email"
-                            type="email"
                             placeholder="m@example.com"
                             className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
-                            required
                             {...field}
                           />
                         </FormControl>

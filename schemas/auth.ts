@@ -60,9 +60,13 @@ export const signUpSchema = z.discriminatedUnion("role", [
 export const signInSchema = z.object({
   email: z.string().email({
     message: "El email es requerido",
+  }).min(1, {
+    message: "El email es requerido",
   }),
   password: z.string({ required_error: "La contraseña es requerida" }).min(1, {
     message: "La contraseña es requerida",
+  }).min(6, {
+    message: "La contraseña debe tener al menos 6 caracteres",
   }),
 })
 
