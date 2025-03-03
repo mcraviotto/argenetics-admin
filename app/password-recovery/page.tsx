@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  email: z.string().min(1, { message: "El email es requerido" }),
+  email: z.string().email({ message: "El email es inválido" }).min(1, { message: "El email es requerido" }),
 })
 
 export default function PasswordRecoveryPage() {
@@ -83,7 +83,6 @@ export default function PasswordRecoveryPage() {
                     <FormControl>
                       <Input
                         id="email"
-                        type="email"
                         placeholder="m@example.com"
                         className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25", "w-full")}
                         {...field}
