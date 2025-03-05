@@ -67,7 +67,7 @@ export default function PatientsPage() {
   }
 
   return (
-    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)] px-2 sm:px-4">
+    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)]">
       <h1 className="text-xl font-medium mb-3">Pacientes</h1>
       <div className="overflow-hidden rounded-sm bg-background shadow-md h-full flex flex-col">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 bg-background p-3 sm:p-4 shadow-md border-b">

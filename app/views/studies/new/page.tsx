@@ -444,7 +444,7 @@ export default function NewStudyPage() {
               control={form.control}
               name="medical_order"
               render={() => (
-                <FormItem className="space-y-1 group col-span-2">
+                <FormItem className="space-y-1 group md:col-span-2">
                   <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.medical_order && "group-focus-within:text-destructive")}>
                     Orden médica
                   </FormLabel>
@@ -486,7 +486,7 @@ export default function NewStudyPage() {
                 control={form.control}
                 name="result"
                 render={() => (
-                  <FormItem className="space-y-1 group col-span-2">
+                  <FormItem className="space-y-1 group md:col-span-2">
                     <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.result && "group-focus-within:text-destructive")}>
                       Resultado
                     </FormLabel>
@@ -529,7 +529,7 @@ export default function NewStudyPage() {
                 control={form.control}
                 name="additional_docs"
                 render={() => (
-                  <FormItem className="space-y-1 group col-span-2">
+                  <FormItem className="space-y-1 group md:col-span-2">
                     <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.additional_docs && "group-focus-within:text-destructive")}>
                       Documentos adicionales
                     </FormLabel>
@@ -578,7 +578,9 @@ export default function NewStudyPage() {
             >
               <Link href={`/views/studies`}>
                 <ArrowLeft />
-                Volver
+                <span className="hidden sm:block">
+                  Volver
+                </span>
               </Link>
             </Button>
             <Button

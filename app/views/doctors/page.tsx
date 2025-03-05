@@ -91,7 +91,7 @@ export default function DoctorsPage() {
   }
 
   return (
-    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)] p-4">
+    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)]">
       <h1 className="text-xl font-medium mb-3">
         Médicos
       </h1>

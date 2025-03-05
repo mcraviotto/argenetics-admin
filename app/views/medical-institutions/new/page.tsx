@@ -271,7 +271,9 @@ export default function NewDoctorPage() {
             >
               <Link href={`/views/medical-institutions`}>
                 <ArrowLeft />
-                Volver
+                <span className="hidden sm:block">
+                  Volver
+                </span>
               </Link>
             </Button>
             <Button

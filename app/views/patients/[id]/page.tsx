@@ -101,7 +101,9 @@ export default function PatientPage() {
           >
             <Link href={`/views/patients`}>
               <ArrowLeft />
-              Volver
+              <span className="hidden sm:block">
+                Volver
+              </span>
             </Link>
           </Button>
           {user?.userable_type === "Administrator" &&

@@ -111,8 +111,6 @@ export default function EditStudyPage() {
     }
   }
 
-  console.log(form.watch())
-
   const result = useWatch({ control: form.control, name: "result" })
   const medical_order = useWatch({ control: form.control, name: "medical_order" })
   const additional_docs = useWatch({ control: form.control, name: "additional_docs" })
@@ -473,7 +471,7 @@ export default function EditStudyPage() {
               control={form.control}
               name="medical_order.storage_ref"
               render={() => (
-                <FormItem className="space-y-1 group col-span-2">
+                <FormItem className="space-y-1 group md:col-span-2">
                   <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.medical_order?.storage_ref && "group-focus-within:text-destructive")}>
                     Orden médica
                   </FormLabel>
@@ -514,7 +512,7 @@ export default function EditStudyPage() {
               control={form.control}
               name="result.storage_ref"
               render={() => (
-                <FormItem className="space-y-1 group col-span-2">
+                <FormItem className="space-y-1 group md:col-span-2">
                   <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.result?.storage_ref && "group-focus-within:text-destructive")}>
                     Resultado
                   </FormLabel>
@@ -556,7 +554,7 @@ export default function EditStudyPage() {
                 control={form.control}
                 name="additional_docs.storage_ref"
                 render={() => (
-                  <FormItem className="space-y-1 group col-span-2">
+                  <FormItem className="space-y-1 group md:col-span-2">
                     <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.additional_docs?.storage_ref && "group-focus-within:text-destructive")}>
                       Documentos adicionales
                     </FormLabel>
@@ -602,7 +600,9 @@ export default function EditStudyPage() {
             >
               <Link href={`/views/studies/${params.id}`}>
                 <ArrowLeft />
-                Volver
+                <span className="hidden sm:block">
+                  Volver
+                </span>
               </Link>
             </Button>
             <Button

@@ -418,14 +418,16 @@ export default function NewDoctorPage() {
               />
             )}
           </div>
-          <div className="flex gap-2 ml-auto w-fit">
+          <div className="flex gap-2 mx-auto w-fit sm:ml-auto">
             <Button
               variant="ghost"
               asChild
             >
               <Link href={`/views/doctors`}>
                 <ArrowLeft />
-                Volver
+                <span className="hidden sm:block">
+                  Volver
+                </span>
               </Link>
             </Button>
             <Button

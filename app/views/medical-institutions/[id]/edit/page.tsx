@@ -290,7 +290,9 @@ export default function EditInstitutionPage() {
             >
               <Link href={`/views/medical-institutions/${params.id}`}>
                 <ArrowLeft />
-                Volver
+                <span className="hidden sm:block">
+                  Volver
+                </span>
               </Link>
             </Button>
             <Button

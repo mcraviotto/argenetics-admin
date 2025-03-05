@@ -37,8 +37,6 @@ export default function StudyPage() {
     }
   };
 
-  console.log(study)
-
   return (
     <div className="flex flex-col gap-4 h-full">
       <h1 className={cn("text-xl font-semibold transition-all duration-200", isLoading ? "blur-[4px]" : "blur-none")}>
@@ -71,7 +69,7 @@ export default function StudyPage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-7 w-7 shrink-0"
                         onClick={() => handleDownload("medical_order", params.id)}
                         disabled={!!downloadStates["medical_order"]}
                       >
@@ -105,7 +103,7 @@ export default function StudyPage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-7 w-7 shrink-0"
                         onClick={() => handleDownload("result", params.id)}
                         disabled={!!downloadStates["result"]}
                       >
@@ -139,7 +137,7 @@ export default function StudyPage() {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="h-7 w-7"
+                        className="h-7 w-7 shrink-0"
                         onClick={() => handleDownload("additional_docs", params.id)}
                         disabled={!!downloadStates["additional_docs"]}
                       >
@@ -177,7 +175,9 @@ export default function StudyPage() {
           <Button variant="ghost" asChild>
             <Link href={`/views/studies`}>
               <ArrowLeft />
-              Volver
+              <span className="hidden sm:block">
+                Volver
+              </span>
             </Link>
           </Button>
           {user?.userable_type === "Administrator" &&

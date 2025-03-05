@@ -420,7 +420,9 @@ export default function NewPatientPage() {
             >
               <Link href={`/views/patients`}>
                 <ArrowLeft />
-                Volver
+                <span className="hidden sm:block">
+                  Volver
+                </span>
               </Link>
             </Button>
             <Button
