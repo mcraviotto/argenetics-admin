@@ -9,7 +9,7 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
-import { useUpdatePasswordMutation } from "@/services/auth"
+import { useSendRecoveryEmailMutation, useUpdatePasswordMutation } from "@/services/auth"
 import { Link, useTransitionRouter } from "next-view-transitions"
 import { toast } from "sonner"
 import { useSearchParams } from "next/navigation"
@@ -36,6 +36,7 @@ export default function OtpPage() {
   const email = searchParams.get("email")
 
   const [updatePassword, { isLoading }] = useUpdatePasswordMutation()
+  const [sendRecoveryEmail] = useSendRecoveryEmailMutation()
 
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [resendCountdown, setResendCountdown] = useState<number>(0)
@@ -89,9 +90,9 @@ export default function OtpPage() {
     return () => clearInterval(timer)
   }, [resendCountdown])
 
-  const handleResendCode = () => {
-
+  const handleResendCode = async () => {
     setResendCountdown(30)
+    await sendRecoveryEmail({ email: email || "" }).unwrap()
   }
 
   return (

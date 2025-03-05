@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useUserQuery } from "@/services/auth";
+import { useSendRecoveryEmailMutation, useUserQuery } from "@/services/auth";
 import Cookies from 'js-cookie';
 import { LogOut } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
