@@ -102,9 +102,9 @@ export default function DoctorsPage() {
           isUserLoading && "blur-sm"
         )}
       >
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 bg-background p-4 shadow-md border-b">
-          <div className="flex flex-col xl:flex-row items-start xl:items-center gap-4 w-full">
-            <div className="relative w-full xl:w-[400px]">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 bg-background p-4 shadow-md border-b">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
+            <div className="relative w-full">
               <Input
                 className="h-9 peer ps-9"
                 placeholder="Buscar por nombre..."
@@ -115,7 +115,7 @@ export default function DoctorsPage() {
                 <Search size={16} strokeWidth={2} aria-hidden="true" />
               </div>
             </div>
-            <div className="flex flex-col xl:flex-row items-start xl:items-center gap-4 w-full">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
               <span className="text-sm font-medium whitespace-nowrap">
                 Filtrar por:
               </span>
@@ -123,7 +123,7 @@ export default function DoctorsPage() {
                 onValueChange={(value) => setFilters({ ...filters, state: value })}
                 value={filters?.state}
               >
-                <SelectTrigger className="w-full xl:w-[200px] h-9">
+                <SelectTrigger className="w-full lg:w-[200px] h-9">
                   <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -139,7 +139,7 @@ export default function DoctorsPage() {
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      "w-full xl:w-[200px] h-9 relative justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25"
+                      "w-full lg:w-[200px] h-9 relative justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25"
                     )}
                   >
                     {filters?.medical_institution_id ? (
@@ -205,8 +205,8 @@ export default function DoctorsPage() {
               </Popover>
             </div>
           </div>
-          <div className="flex items-center gap-3 w-full xl:w-auto justify-end">
-            <Button size="sm" className="w-full xl:w-auto" asChild>
+          <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
+            <Button size="sm" className="w-full lg:w-auto" asChild>
               <Link href="/views/doctors/new">
                 <Plus className="mr-2" />
                 Nuevo médico

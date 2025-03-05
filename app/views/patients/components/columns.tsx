@@ -88,10 +88,10 @@ export const columns: ColumnDef<ListPatient>[] = [
     cell: ({ row }) => (
       <Badge
         className={cn("shadow-none rounded-sm",
-          patient_status_adapter[row.original.user.state as keyof typeof patient_status_adapter].color,
+          patient_status_adapter[row?.original?.user?.state as keyof typeof patient_status_adapter]?.color,
         )}
       >
-        {patient_status_adapter[row.original.user.state as keyof typeof patient_status_adapter].label}
+        {patient_status_adapter[row?.original?.user?.state as keyof typeof patient_status_adapter]?.label}
       </Badge>
     ),
     size: 100,

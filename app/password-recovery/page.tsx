@@ -1,23 +1,17 @@
-'use client'
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { useSendRecoveryEmailMutation } from "@/services/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
-import { Link, useTransitionRouter } from "next-view-transitions";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { useSendRecoveryEmailMutation } from "@/services/auth"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ArrowLeft } from "lucide-react"
+import { Link, useTransitionRouter } from "next-view-transitions"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { z } from "zod"
 
 const FormSchema = z.object({
   email: z.string().email({ message: "El email es inválido" }).min(1, { message: "El email es requerido" }),
@@ -41,7 +35,7 @@ export default function PasswordRecoveryPage() {
       router.push(`/password-recovery/otp?email=${data.email}`)
     } catch (err: any) {
       toast.custom((t) => (
-        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-full max-w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
           <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
         </div>
@@ -51,30 +45,22 @@ export default function PasswordRecoveryPage() {
 
   return (
     <div className={cn("flex flex-col gap-6 w-full")}>
-      <Card className="shadow-lg shadow-border p-6 border-none relative">
-        <CardHeader className="text-center">
-          <Button
-            variant="link"
-            className="px-2 absolute top-2 left-4"
-            type="button"
-            disableRipple
-            asChild
-          >
-            <Link href="/sign-in">
-              <ArrowLeft />
-              Volver
+      <Card className="shadow-lg shadow-border p-3 sm:p-6 border-none relative">
+        <CardHeader className="text-center p-4 sm:p-6">
+          <Button variant="link" className="px-2 absolute top-2 left-2 sm:left-4" type="button" disableRipple asChild>
+            <Link href="/sign-in" className="flex items-center gap-1 text-sm">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Volver</span>
             </Link>
           </Button>
-          <CardTitle className="text-2xl font-medium">
-            Recuperar contraseña
-          </CardTitle>
-          <CardDescription className="text-sm text-neutral-500">
+          <CardTitle className="text-xl sm:text-2xl font-medium mt-2">Recuperar contraseña</CardTitle>
+          <CardDescription className="text-xs sm:text-sm text-neutral-500">
             Ingresa tu email y te enviaremos un código de recuperación
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col gap-6 items-center">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full flex flex-col gap-4 sm:gap-6 items-center">
               <FormField
                 control={form.control}
                 name="email"
@@ -84,7 +70,11 @@ export default function PasswordRecoveryPage() {
                       <Input
                         id="email"
                         placeholder="m@example.com"
-                        className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25", "w-full")}
+                        className={cn(
+                          form.formState.errors.email &&
+                          "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                          "w-full",
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -92,11 +82,7 @@ export default function PasswordRecoveryPage() {
                   </FormItem>
                 )}
               />
-              <Button
-                type="submit"
-                className="w-full"
-                loading={isLoading}
-              >
+              <Button type="submit" className="w-full" loading={isLoading}>
                 Confirmar
               </Button>
             </form>

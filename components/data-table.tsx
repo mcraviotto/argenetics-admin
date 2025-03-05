@@ -132,7 +132,7 @@ export default function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-between gap-8 bg-background p-4 rounded-b-sm border-t mt-auto">
+      <div className="flex flex-col items-center justify-between gap-2 bg-background p-4 rounded-b-sm border-t mt-auto sm:flex-row sm:gap-8">
         <div className="flex grow justify-start whitespace-nowrap text-sm text-muted-foreground">
           <p className="whitespace-nowrap text-sm text-muted-foreground" aria-live="polite">
             Mostrando{" "}

@@ -52,13 +52,13 @@ export default function EditPatientPage() {
     defaultValues: {
       first_name: patient?.first_name || "",
       last_name: patient?.last_name || "",
-      email: patient?.user.email || "",
+      email: patient?.user?.email || "",
       identification_number: patient?.identification_number || "",
       phone_number: patient?.phone_number || "",
       gender: patient?.gender,
       city: patient?.city || "",
       state: patient?.state || "",
-      patient_state: patient?.user.state,
+      patient_state: patient?.user?.state,
     },
   })
 
@@ -95,12 +95,12 @@ export default function EditPatientPage() {
     form.reset({
       first_name: patient.first_name,
       last_name: patient.last_name,
-      email: patient.user.email,
+      email: patient.user?.email,
       identification_number: patient.identification_number,
       phone_number: patient.phone_number,
       birth_date: parseDate(formatDateToISO(patient.birth_date)),
       gender: patient.gender,
-      patient_state: patient.user.state,
+      patient_state: patient.user?.state,
       state: patient.state,
       city: patient.city,
     })

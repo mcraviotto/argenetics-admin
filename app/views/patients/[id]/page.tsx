@@ -40,7 +40,7 @@ export default function PatientPage() {
           <div className="flex flex-col gap-1">
             <label className="text-muted-foreground text-sm">Correo electrónico</label>
             <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
-              {!patient ? placeholder(15) : patient?.user.email ?? ""}
+              {!patient ? placeholder(15) : patient?.user?.email ?? ""}
             </span>
           </div>
           <div className="flex flex-col gap-1">

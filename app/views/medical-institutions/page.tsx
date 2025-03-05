@@ -70,14 +70,12 @@ export default function MedicalInstitutionsPage() {
   }
 
   return (
-    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)]">
-      <h1 className="text-xl font-medium mb-3">
-        Centros médicos
-      </h1>
+    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)] px-2 sm:px-4">
+      <h1 className="text-xl font-medium mb-3">Centros médicos</h1>
       <div className="overflow-hidden rounded-sm bg-background shadow-md h-full flex flex-col">
-        <div className="flex items-center justify-between gap-3 bg-background p-4 shadow-md border-b">
-          <div className="flex items-center gap-4 w-full">
-            <div className="relative w-[400px]">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 bg-background p-3 sm:p-4 shadow-md border-b">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
+            <div className="relative w-full lg:w-[400px]">
               <Input
                 className="h-9 peer ps-9"
                 placeholder="Buscar por nombre..."
@@ -88,17 +86,10 @@ export default function MedicalInstitutionsPage() {
                 <Search size={16} strokeWidth={2} aria-hidden="true" />
               </div>
             </div>
-            <div className="flex items-center gap-4 w-full">
-              <span className="text-sm font-medium text-nowrap">
-                Filtrar por:
-              </span>
-              <Select
-                onValueChange={(value) => setFilters({ ...filters, state: value })}
-                value={filters?.state}
-              >
-                <SelectTrigger
-                  className="w-[200px] h-9"
-                >
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
+              <span className="text-sm font-medium whitespace-nowrap">Filtrar por:</span>
+              <Select onValueChange={(value) => setFilters({ ...filters, state: value })} value={filters?.state}>
+                <SelectTrigger className="w-full lg:w-[200px] h-9">
                   <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,10 +101,10 @@ export default function MedicalInstitutionsPage() {
               </Select>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="sm" className="ml-auto" asChild>
+          <div className="flex items-center gap-3 w-full lg:w-auto justify-end mt-2 lg:mt-0">
+            <Button size="sm" className="w-full lg:w-auto" asChild>
               <Link href="/views/medical-institutions/new">
-                <Plus />
+                <Plus className="mr-1" />
                 Nuevo centro médico
               </Link>
             </Button>
@@ -136,5 +127,6 @@ export default function MedicalInstitutionsPage() {
         />
       </div>
     </div>
-  );
+  )
 }
+

@@ -40,7 +40,6 @@ export default function PatientsPage() {
     state: ""
   });
 
-  //const { data: institutions } = useGetAllInstitutionsQuery({ query: "" });
   const { data: patients, isLoading: isLoadingPatients } = useListPatientsQuery({
     page: pagination.pageIndex + 1,
     medical_institution_id: filters?.medical_institution_id ?? "",
@@ -68,14 +67,12 @@ export default function PatientsPage() {
   }
 
   return (
-    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)]">
-      <h1 className="text-xl font-medium mb-3">
-        Pacientes
-      </h1>
+    <div className="space-y-1 flex flex-col h-[calc(100vh-162px)] px-2 sm:px-4">
+      <h1 className="text-xl font-medium mb-3">Pacientes</h1>
       <div className="overflow-hidden rounded-sm bg-background shadow-md h-full flex flex-col">
-        <div className="flex items-center justify-between gap-3 bg-background p-4 shadow-md border-b">
-          <div className="flex items-center gap-4 w-full">
-            <div className="relative w-[400px]">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 bg-background p-3 sm:p-4 shadow-md border-b">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
+            <div className="relative w-full lg:w-[400px]">
               <Input
                 className="h-9 peer ps-9"
                 placeholder="Buscar por nombre..."
@@ -86,17 +83,10 @@ export default function PatientsPage() {
                 <Search size={16} strokeWidth={2} aria-hidden="true" />
               </div>
             </div>
-            <div className="flex items-center gap-4 w-full">
-              <span className="text-sm font-medium text-nowrap">
-                Filtrar por:
-              </span>
-              <Select
-                onValueChange={(value) => setFilters({ ...filters, state: value })}
-                value={filters?.state}
-              >
-                <SelectTrigger
-                  className="w-[200px] h-9"
-                >
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 w-full">
+              <span className="text-sm font-medium whitespace-nowrap">Filtrar por:</span>
+              <Select onValueChange={(value) => setFilters({ ...filters, state: value })} value={filters?.state}>
+                <SelectTrigger className="w-full lg:w-[200px] h-9">
                   <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -106,82 +96,12 @@ export default function PatientsPage() {
                   <SelectItem value="all">Todos</SelectItem>
                 </SelectContent>
               </Select>
-              {/*             <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "w-[200px] h-9 relative justify-between px-3 !shadow-none hover:border-ring/50 data-[state=open]:border-primary data-[state=open]:border-2 data-[state=open]:!shadow-md data-[state=open]:!shadow-primary/25"
-                    )}
-                  >
-                    {filters?.medical_institution_id ? (
-                      <div className="flex w-full items-center justify-between">
-                        <p className="truncate">
-                          {institutions?.find((institution) => institution.id === filters.medical_institution_id)?.name}
-                        </p>
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setFilters({ ...filters, medical_institution_id: '' });
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <X className="opacity-50" />
-                        </span>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="text-muted-foreground/50">
-                          Centro médico
-                        </span>
-                        <ChevronsUpDown className="opacity-50" />
-                      </>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0">
-                  <Command>
-                    <CommandInput placeholder="Buscar..." className="h-10" />
-                    <CommandList className="p-1">
-                      <CommandEmpty>No hay resultados</CommandEmpty>
-                      <CommandGroup>
-                        {institutions?.map((institution) => (
-                          <CommandItem
-                            value={institution.id}
-                            key={institution.id}
-                            onSelect={() => {
-                              setPagination({ ...pagination, pageIndex: 0 });
-                              setFilters({
-                                ...filters,
-                                medical_institution_id: institution.id
-                              });
-                            }}
-                          >
-                            {institution.name}
-                            <CheckIcon
-                              className={cn(
-                                "ml-auto",
-                                institution.id === filters?.medical_institution_id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover> */}
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="sm" className="ml-auto" asChild>
+          <div className="flex items-center gap-3 w-full lg:w-auto justify-end mt-2 lg:mt-0">
+            <Button size="sm" className="w-full lg:w-auto" asChild>
               <Link href="/views/patients/new">
-                <Plus />
+                <Plus className="mr-1" />
                 Nuevo paciente
               </Link>
             </Button>
@@ -204,6 +124,5 @@ export default function PatientsPage() {
         />
       </div>
     </div>
-  );
+  )
 }
-

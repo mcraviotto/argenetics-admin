@@ -33,18 +33,24 @@ export default function Navbar() {
   const activeTab = filteredTabs.find(tab => pathname.includes(tab.id))?.id || filteredTabs[0]?.id || ""
 
   return (
-    <Tabs value={activeTab} className="px-6 border-b border-border shadow-sm relative z-10 bg-background flex items-center">
-      <TabsList className="gap-2 bg-transparent py-2">
+    <Tabs value={activeTab} className="px-6 border-b border-border shadow-sm relative z-10 bg-background items-center flex">
+      <TabsList className="gap-2 bg-transparent py-2 justify-center sm:justify-start">
         {filteredTabs.map((tab, idx) => (
           <TabsTrigger value={tab.id} key={tab.id} asChild>
             <Button
               variant="ghost"
               size="sm"
-              className={cn("data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:shadow-primary/50 hover:bg-accent", isLoading && "blur-md data-[state=active]:bg-inherit data-[state=active]:shadow-none data-[state=active]:text-foreground pointer-events-none", isLoading && idx === 0 && "!bg-primary")}
+              className={cn(
+                "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:shadow-primary/50 hover:bg-accent",
+                isLoading && "blur-md data-[state=active]:bg-inherit data-[state=active]:shadow-none data-[state=active]:text-foreground pointer-events-none",
+                isLoading && idx === 0 && "!bg-primary"
+              )}
               onClick={() => router.push(`/${tab.id}`)}
             >
-              {tab.icon && <tab.icon size={16} className="-ms-0.5 me-1.5 opacity-80" aria-hidden strokeWidth={2} />}
-              {tab.label}
+              {tab.icon && <tab.icon size={16} className="-ms-0.5 sm:me-1.5 opacity-80" aria-hidden strokeWidth={2} />}
+              <span className="hidden sm:block">
+                {tab.label}
+              </span>
             </Button>
           </TabsTrigger>
         ))}

@@ -1,29 +1,30 @@
-'use client'
+"use client"
 
-import { CountrySelect, FlagComponent, PhoneInput } from "@/components/phone-input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { newMedicalInstitutionSchema } from "@/schemas/auth";
-import { useSignUpMutation } from "@/services/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Cookies from 'js-cookie';
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { Link, useTransitionRouter } from "next-view-transitions";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import * as RPNInput from "react-phone-number-input";
-import { toast } from "sonner";
-import { z } from "zod";
+import { CountrySelect, FlagComponent, PhoneInput } from "@/components/phone-input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+import { newMedicalInstitutionSchema } from "@/schemas/auth"
+import { useLazyUserQuery, useSignUpMutation } from "@/services/auth"
+import { zodResolver } from "@hookform/resolvers/zod"
+import Cookies from "js-cookie"
+import { ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { Link, useTransitionRouter } from "next-view-transitions"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import * as RPNInput from "react-phone-number-input"
+import { toast } from "sonner"
+import type { z } from "zod"
 
 export default function InstitutionRegisterPage() {
-  const router = useTransitionRouter();
+  const router = useTransitionRouter()
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false)
 
-  const [signUp, { isLoading }] = useSignUpMutation();
+  const [signUp, { isLoading }] = useSignUpMutation()
+  const [getUser] = useLazyUserQuery()
 
   const form = useForm<z.infer<typeof newMedicalInstitutionSchema>>({
     resolver: zodResolver(newMedicalInstitutionSchema),
@@ -44,13 +45,15 @@ export default function InstitutionRegisterPage() {
       const response = await signUp(values).unwrap()
 
       if ("token" in response) {
-        Cookies.set('sessionToken', response.token);
+        Cookies.set("sessionToken", response.token)
       }
 
-      router.push("/")
+      await getUser().unwrap()
+
+      router.push("/otp")
     } catch (err: any) {
       toast.custom((t) => (
-        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-full max-w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
           <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
         </div>
@@ -59,30 +62,22 @@ export default function InstitutionRegisterPage() {
   }
 
   return (
-    <Card className="shadow-lg shadow-border p-6 border-none w-[700px] flex flex-col gap-4">
-      <CardHeader className="text-center relative">
-        <Button
-          variant="link"
-          className="px-2 absolute top-2 left-4"
-          type="button"
-          disableRipple
-          asChild
-        >
-          <Link href="/sign-up">
-            <ArrowLeft />
-            Volver
+    <Card className="shadow-lg shadow-border p-3 sm:p-6 border-none w-full max-w-[700px] flex flex-col gap-4">
+      <CardHeader className="text-center relative p-4 sm:p-6">
+        <Button variant="link" className="px-2 absolute top-2 left-2 sm:left-4" type="button" disableRipple asChild>
+          <Link href="/sign-up" className="flex items-center gap-1 text-sm">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Volver</span>
           </Link>
         </Button>
-        <CardTitle className="text-2xl font-medium">
-          Registrar institución médica
-        </CardTitle>
-        <CardDescription className="text-sm text-center">
+        <CardTitle className="text-xl sm:text-2xl font-medium mt-2">Registrar institución médica</CardTitle>
+        <CardDescription className="text-xs sm:text-sm text-center">
           Completa el formulario para registrar una institución médica
         </CardDescription>
       </CardHeader>
-      <CardContent className="w-full flex flex-col gap-6">
+      <CardContent className="w-full flex flex-col gap-4 sm:gap-6 px-3 sm:px-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="name"
@@ -90,7 +85,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="name"
-                    className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.name && "group-focus-within:text-destructive")}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.name && "group-focus-within:text-destructive",
+                    )}
                   >
                     Nombre
                   </FormLabel>
@@ -99,7 +97,10 @@ export default function InstitutionRegisterPage() {
                       id="name"
                       type="name"
                       placeholder="Jhon"
-                      className={cn(form.formState.errors.name && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                      className={cn(
+                        form.formState.errors.name &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -114,7 +115,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="email"
-                    className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.email && "group-focus-within:text-destructive")}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.email && "group-focus-within:text-destructive",
+                    )}
                   >
                     Correo electrónico
                   </FormLabel>
@@ -123,7 +127,10 @@ export default function InstitutionRegisterPage() {
                       id="email"
                       type="email"
                       placeholder="jhon@gmail.com"
-                      className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                      className={cn(
+                        form.formState.errors.email &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -138,7 +145,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="identification_number"
-                    className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.fiscal_number && "group-focus-within:text-destructive")}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.fiscal_number && "group-focus-within:text-destructive",
+                    )}
                   >
                     CUIT
                   </FormLabel>
@@ -147,7 +157,10 @@ export default function InstitutionRegisterPage() {
                       id="fiscal_number"
                       type="text"
                       placeholder="123456789"
-                      className={cn(form.formState.errors.fiscal_number && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                      className={cn(
+                        form.formState.errors.fiscal_number &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -162,7 +175,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="address"
-                    className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.address && "group-focus-within:text-destructive")}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.address && "group-focus-within:text-destructive",
+                    )}
                   >
                     Dirección
                   </FormLabel>
@@ -171,7 +187,10 @@ export default function InstitutionRegisterPage() {
                       id="address"
                       type="address"
                       placeholder="Jhon"
-                      className={cn(form.formState.errors.address && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                      className={cn(
+                        form.formState.errors.address &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
                       {...field}
                     />
                   </FormControl>
@@ -186,10 +205,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="primary_phone_number"
-                    className={
-                      cn("group-focus-within:text-primary transition-colors",
-                        form.formState.errors.primary_phone_number && "group-focus-within:text-destructive"
-                      )}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.primary_phone_number && "group-focus-within:text-destructive",
+                    )}
                   >
                     Número de teléfono principal
                   </FormLabel>
@@ -217,10 +236,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="secondary_phone_number"
-                    className={
-                      cn("group-focus-within:text-primary transition-colors",
-                        form.formState.errors.secondary_phone_number && "group-focus-within:text-destructive"
-                      )}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.secondary_phone_number && "group-focus-within:text-destructive",
+                    )}
                   >
                     Número de teléfono secundario
                   </FormLabel>
@@ -248,7 +267,10 @@ export default function InstitutionRegisterPage() {
                 <FormItem className="flex flex-col group">
                   <FormLabel
                     htmlFor="password"
-                    className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.password && "group-focus-within:text-destructive")}
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.password && "group-focus-within:text-destructive",
+                    )}
                   >
                     Contraseña
                   </FormLabel>
@@ -258,7 +280,10 @@ export default function InstitutionRegisterPage() {
                         id="password"
                         type={isVisible ? "text" : "password"}
                         placeholder="•••••••••••"
-                        className={cn(form.formState.errors.password && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                        className={cn(
+                          form.formState.errors.password &&
+                          "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                        )}
                         {...field}
                       />
                       <Button
@@ -282,15 +307,17 @@ export default function InstitutionRegisterPage() {
                 </FormItem>
               )}
             />
+            <div className="sm:col-span-2">
+              <Button
+                loading={isLoading}
+                className="w-full relative overflow-hidden mt-2"
+                onClick={form.handleSubmit(onSubmit)}
+              >
+                Crear cuenta
+              </Button>
+            </div>
           </form>
         </Form>
-        <Button
-          loading={isLoading}
-          className="w-full relative overflow-hidden"
-          onClick={form.handleSubmit(onSubmit)}
-        >
-          Crear cuenta
-        </Button>
       </CardContent>
     </Card>
   )

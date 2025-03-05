@@ -56,7 +56,6 @@ export default async function authMiddleware(request: NextRequest) {
   if (isPublicRoute(pathname, publicRoutes)) {
     return NextResponse.next();
   }
-
   if (!sessionToken) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }

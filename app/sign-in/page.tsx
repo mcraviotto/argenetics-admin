@@ -1,14 +1,8 @@
-'use client'
+"use client"
 
 import { api } from "@/api"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -16,23 +10,23 @@ import { signInSchema } from "@/schemas/auth"
 import { useLazyUserQuery, useSignInMutation } from "@/services/auth"
 import { store } from "@/store"
 import { zodResolver } from "@hookform/resolvers/zod"
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie"
 import { Eye, EyeOff } from "lucide-react"
 import { useTransitionRouter } from "next-view-transitions"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { z } from "zod"
+import type { z } from "zod"
 
 export default function SignIn() {
   const router = useTransitionRouter()
 
-  const [authUser, { isLoading }] = useSignInMutation();
-  const [getUser] = useLazyUserQuery();
+  const [authUser, { isLoading }] = useSignInMutation()
+  const [getUser] = useLazyUserQuery()
 
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false)
 
-  const toggleVisibility = () => setIsVisible((prevState) => !prevState);
+  const toggleVisibility = () => setIsVisible((prevState) => !prevState)
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -47,16 +41,16 @@ export default function SignIn() {
       const response = await authUser(values).unwrap()
 
       if ("token" in response) {
-        Cookies.set('sessionToken', response.token);
+        Cookies.set("sessionToken", response.token)
       }
 
       await getUser().unwrap()
 
       router.push("/views")
-      store.dispatch(api.util.resetApiState());
+      store.dispatch(api.util.resetApiState())
     } catch (err: any) {
       toast.custom((t) => (
-        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-full max-w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
           <p className="text-sm">{err.data.message || err.data.error || "Ocurrió un error inesperado"}</p>
         </div>
@@ -65,15 +59,15 @@ export default function SignIn() {
   }
 
   return (
-    <div className={cn("flex flex-col gap-6 w-full")}>
-      <Card className="shadow-lg shadow-border p-6 border-none">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-medium">Iniciar sesión</CardTitle>
+    <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto")}>
+      <Card className="shadow-lg shadow-border p-3 sm:p-6 border-none">
+        <CardHeader className="text-center p-4 sm:p-6">
+          <CardTitle className="text-xl sm:text-2xl font-medium">Iniciar sesión</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid gap-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+              <div className="grid gap-3 sm:gap-4">
                 <div className="grid gap-2 group">
                   <FormField
                     control={form.control}
@@ -82,7 +76,10 @@ export default function SignIn() {
                       <FormItem className="flex flex-col">
                         <FormLabel
                           htmlFor="email"
-                          className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.email && "group-focus-within:text-destructive")}
+                          className={cn(
+                            "group-focus-within:text-primary transition-colors",
+                            form.formState.errors.email && "group-focus-within:text-destructive",
+                          )}
                         >
                           Correo electrónico
                         </FormLabel>
@@ -90,7 +87,10 @@ export default function SignIn() {
                           <Input
                             id="email"
                             placeholder="m@example.com"
-                            className={cn(form.formState.errors.email && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                            className={cn(
+                              form.formState.errors.email &&
+                              "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                            )}
                             {...field}
                           />
                         </FormControl>
@@ -107,7 +107,10 @@ export default function SignIn() {
                       <FormItem className="flex flex-col">
                         <FormLabel
                           htmlFor="password"
-                          className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.password && "group-focus-within:text-destructive")}
+                          className={cn(
+                            "group-focus-within:text-primary transition-colors",
+                            form.formState.errors.password && "group-focus-within:text-destructive",
+                          )}
                         >
                           Contraseña
                         </FormLabel>
@@ -117,7 +120,10 @@ export default function SignIn() {
                               id="password"
                               type={isVisible ? "text" : "password"}
                               placeholder="•••••••••••"
-                              className={cn(form.formState.errors.password && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                              className={cn(
+                                form.formState.errors.password &&
+                                "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                              )}
                               {...field}
                             />
                             <Button
@@ -147,18 +153,18 @@ export default function SignIn() {
                   type="button"
                   disableRipple
                   onClick={() => router.push("/password-recovery")}
+                  className="text-sm mx-auto justify-start px-0 h-auto"
                 >
                   Olvidé mi contraseña
                 </Button>
-                <Button loading={isLoading} className="w-full relative overflow-hidden">
+                <Button loading={isLoading} className="w-full relative overflow-hidden mt-2">
                   Ingresar
                 </Button>
-
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-xs sm:text-sm pt-2">
                   ¿No tenés una cuenta?
                   <Button
                     variant="link"
-                    className="px-2"
+                    className="px-1 sm:px-2 text-xs sm:text-sm h-auto"
                     type="button"
                     disableRipple
                     onClick={() => router.push("/sign-up")}
