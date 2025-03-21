@@ -107,11 +107,13 @@ export default function StudiesPage() {
                   <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ready_to_download">Activo</SelectItem>
-                  <SelectItem value="requested_to_download">Solicitado</SelectItem>
                   <SelectItem value="initial">Inicial</SelectItem>
+                  <SelectItem value="ready_to_download">Listo para descargar</SelectItem>
+                  <SelectItem value="pending_pickup">Coordina retiro</SelectItem>
+                  <SelectItem value="at_lab">En laboratorio</SelectItem>
+                  <SelectItem value="report_completed">Informe realizado</SelectItem>
+                  <SelectItem value="requested_to_download">Solicitado para descargar</SelectItem>
                   <SelectItem value="expired">Expirado</SelectItem>
-                  <SelectItem value="all">Todos</SelectItem>
                 </SelectContent>
               </Select>
               <Popover>

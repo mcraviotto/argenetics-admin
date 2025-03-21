@@ -57,14 +57,14 @@ export default function OtpPage() {
       router.push("/sign-in")
 
       toast.custom((t) => (
-        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-full max-w-[356px] text-accent shadow-green-600/50">
+        <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
           <p className="font-medium">Contraseña actualizada</p>
           <p className="text-sm">Tu contraseña ha sido actualizada correctamente</p>
         </div>
       ))
     } catch (err: any) {
       toast.custom((t) => (
-        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-full max-w-[356px] text-accent shadow-red-600/50">
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
           <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
         </div>

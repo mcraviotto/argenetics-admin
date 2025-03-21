@@ -27,53 +27,43 @@ const createAdaptedNewStudySchema = (userableType: string) =>
       medical_order_ref: true,
       storage_ref: true,
       additional_docs_storage_ref: true,
-      state: true,
+      consent_storage_ref: true,
+      clinical_records_storage_ref: true,
+      state: true
     })
     .extend({
       study_category_id: z.string({ required_error: "La categoría de estudio es requerida" }),
       result: z.instanceof(File).optional(),
       medical_order: z.instanceof(File).optional(),
       additional_docs: z.instanceof(File).optional(),
+      consent: z.instanceof(File).optional(),
+      clinical_records: z.instanceof(File).optional(),
+      histopathological: z.instanceof(File).optional()
     })
     .superRefine((data, ctx) => {
       if (userableType === "MedicalInstitution") {
         if (!data.medical_order) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "La orden médica es requerida",
-            path: ["medical_order"],
-          });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: "La orden médica es requerida", path: ["medical_order"] })
         }
-      } else if (
-        userableType === "Patient" ||
-        userableType === "Doctor" ||
-        userableType === "Administrator"
-      ) {
+      } else if (userableType === "Patient" || userableType === "Doctor" || userableType === "Administrator") {
         if (!data.medical_order) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "La orden médica es requerida",
-            path: ["medical_order"],
-          });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: "La orden médica es requerida", path: ["medical_order"] })
         }
       } else {
         if (!data.result) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "El resultado es requerido",
-            path: ["result"],
-          });
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: "El resultado es requerido", path: ["result"] })
         }
       }
-
       if (data.title === "prosigna" && !data.additional_docs) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Los documentos adicionales son requeridos para estudios prosigna",
-          path: ["additional_docs"],
-        });
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Los documentos adicionales son requeridos para estudios prosigna", path: ["additional_docs"] })
       }
-    });
+      if (data.study_category_id === "prestaciones_biologia_molecular" && !data.consent) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "El consentimiento informado es requerido", path: ["consent"] })
+      }
+      if (data.study_category_id === "prestaciones_anatomia_patologica" && !data.histopathological) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "El informe histopatológico es requerido", path: ["histopathological"] })
+      }
+    })
 
 export default function NewStudyPage() {
   const router = useTransitionRouter();
@@ -94,35 +84,64 @@ export default function NewStudyPage() {
       doctor_id: undefined,
     },
   })
+  console.log(form.watch())
+  console.log(form.formState.errors)
 
   async function onSubmit(values: z.infer<typeof adaptedSchema>) {
     try {
-      const { result, medical_order, additional_docs, study_category_id, ...data } = values
+      const {
+        result,
+        medical_order,
+        additional_docs,
+        consent,
+        clinical_records,
+        histopathological,
+        study_category_id,
+        ...data
+      } = values
 
-      const result_storage_ref = result ? await uploadFileToS3({ file: result, patient_id: values.patient_id }).unwrap() : ""
-      const medical_order_storage_ref = medical_order ? await uploadFileToS3({ file: medical_order, patient_id: values.patient_id }).unwrap() : ""
-      const additional_docs_storage_ref = additional_docs ? await uploadFileToS3({ file: additional_docs, patient_id: values.patient_id }).unwrap() : ""
+      const result_storage_ref = result
+        ? await uploadFileToS3({ file: result, patient_id: values.patient_id }).unwrap()
+        : ""
+      const medical_order_storage_ref = medical_order
+        ? await uploadFileToS3({ file: medical_order, patient_id: values.patient_id }).unwrap()
+        : ""
+      const additional_docs_storage_ref = additional_docs
+        ? await uploadFileToS3({ file: additional_docs, patient_id: values.patient_id }).unwrap()
+        : ""
+      const consent_storage_ref = consent
+        ? await uploadFileToS3({ file: consent, patient_id: values.patient_id }).unwrap()
+        : ""
+      const clinical_records_storage_ref = clinical_records
+        ? await uploadFileToS3({ file: clinical_records, patient_id: values.patient_id }).unwrap()
+        : ""
+      const histopathological_storage_ref = histopathological
+        ? await uploadFileToS3({ file: histopathological, patient_id: values.patient_id }).unwrap()
+        : ""
 
       await createStudy({
         ...data,
         storage_ref: result_storage_ref,
         medical_order_ref: medical_order_storage_ref,
         additional_docs_storage_ref,
+        consent_storage_ref,
+        clinical_records_storage_ref,
+        histopathological_storage_ref
       }).unwrap()
 
-      toast.custom((t) => (
+      toast.custom(() => (
         <div className="flex flex-col gap-1 bg-green-600 border-green-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-green-600/50">
           <p className="font-medium">Estudio creado</p>
           <p className="text-sm">El estudio ha sido creado exitosamente</p>
         </div>
       ))
 
-      router.push(`/views/studies`)
+      router.push("/views/studies")
     } catch (err: any) {
-      toast.custom((t) => (
+      toast.custom(() => (
         <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
-          <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
+          <p className="text-sm">{err.data?.error || "Ocurrió un error inesperado"}</p>
         </div>
       ))
     }
@@ -131,8 +150,10 @@ export default function NewStudyPage() {
   const result = useWatch({ control: form.control, name: "result" })
   const medical_order = useWatch({ control: form.control, name: "medical_order" })
   const additional_docs = useWatch({ control: form.control, name: "additional_docs" })
+  const consent = useWatch({ control: form.control, name: "consent" })
+  const clinical_records = useWatch({ control: form.control, name: "clinical_records" })
+  const histopathological = useWatch({ control: form.control, name: "histopathological" })
   const selected_category = useWatch({ control: form.control, name: "study_category_id" })
-  const study_type = useWatch({ control: form.control, name: "title" })
 
   useEffect(() => {
     if (user && user?.userable_type === "Patient") {
@@ -481,6 +502,179 @@ export default function NewStudyPage() {
                 </FormItem>
               )}
             />
+            {selected_category === "prestaciones_biologia_molecular" && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="consent"
+                  render={() => (
+                    <FormItem className="space-y-1 group md:col-span-2">
+                      <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.consent && "group-focus-within:text-destructive")}>
+                        Consentimiento informado
+                      </FormLabel>
+                      {consent ? (
+                        <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
+                              <FileIcon className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="font-medium text-sm">{consent.name}</span>
+                          </div>
+                          <Button
+                            className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                            variant="ghost"
+                            type="button"
+                            size="icon"
+                            onClick={() => {
+                              form.setValue("consent", undefined, { shouldValidate: true })
+                            }}
+                          >
+                            <X />
+                          </Button>
+                        </div>
+                      ) : (
+                        <FormControl>
+                          <FileUploader id="consent" onChange={file => form.setValue("consent", file, { shouldValidate: true })} />
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="clinical_records"
+                  render={() => (
+                    <FormItem className="space-y-1 group md:col-span-2">
+                      <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.clinical_records && "group-focus-within:text-destructive")}>
+                        Historial clínico
+                      </FormLabel>
+                      {clinical_records ? (
+                        <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
+                              <FileIcon className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="font-medium text-sm">{clinical_records.name}</span>
+                          </div>
+                          <Button
+                            className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                            variant="ghost"
+                            type="button"
+                            size="icon"
+                            onClick={() => {
+                              form.setValue("clinical_records", undefined, { shouldValidate: true })
+                            }}
+                          >
+                            <X />
+                          </Button>
+                        </div>
+                      ) : (
+                        <FormControl>
+                          <FileUploader id="clinical_records" onChange={file => form.setValue("clinical_records", file, { shouldValidate: true })} />
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="additional_docs"
+                  render={() => (
+                    <FormItem className="space-y-1 group md:col-span-2">
+                      <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.additional_docs && "group-focus-within:text-destructive")}>
+                        Documentos adicionales
+                      </FormLabel>
+                      {(!!additional_docs) ? (
+                        <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
+                              <FileIcon className="w-3.5 h-3.5" />
+                            </span>
+                            <span className="font-medium text-sm">{additional_docs.name}</span>
+                          </div>
+                          <Button
+                            className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                            variant="ghost"
+                            type="button"
+                            size="icon"
+                            onClick={() => {
+                              form.reset({
+                                ...form.getValues(),
+                                additional_docs: undefined,
+                              })
+                            }}
+                          >
+                            <X />
+                          </Button>
+                        </div>
+                      ) :
+                        <FormControl>
+                          <FileUploader
+                            id="additional_docs"
+                            onChange={(file) => {
+                              form.setValue("additional_docs", file, { shouldValidate: true })
+                            }} />
+                        </FormControl>
+                      }
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {selected_category === "prestaciones_anatomia_patologica" && (
+              <FormField
+                control={form.control}
+                name="histopathological"
+                render={() => (
+                  <FormItem className="space-y-1 group md:col-span-2">
+                    <FormLabel
+                      className={cn(
+                        "group-focus-within:text-primary transition-colors",
+                        form.formState.errors.histopathological && "group-focus-within:text-destructive"
+                      )}
+                    >
+                      Informe histopatológico
+                    </FormLabel>
+                    {histopathological ? (
+                      <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
+                            <FileIcon className="w-3.5 h-3.5" />
+                          </span>
+                          <span className="font-medium text-sm">{histopathological.name}</span>
+                        </div>
+                        <Button
+                          className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+                          variant="ghost"
+                          type="button"
+                          size="icon"
+                          onClick={() => {
+                            form.setValue("histopathological", undefined, { shouldValidate: true })
+                          }}
+                        >
+                          <X />
+                        </Button>
+                      </div>
+                    ) : (
+                      <FormControl>
+                        <FileUploader
+                          id="histopathological"
+                          onChange={(file) => {
+                            form.setValue("histopathological", file, { shouldValidate: true })
+                          }}
+                        />
+                      </FormControl>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {user?.userable_type !== "Patient" && user?.userable_type !== "Doctor" && user?.userable_type !== "MedicalInstitution" && (
               <FormField
                 control={form.control}
@@ -516,52 +710,6 @@ export default function NewStudyPage() {
                           id="result"
                           onChange={(file) => {
                             form.setValue("result", file, { shouldValidate: true })
-                          }} />
-                      </FormControl>
-                    }
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            {study_type === "prosigna" && (
-              <FormField
-                control={form.control}
-                name="additional_docs"
-                render={() => (
-                  <FormItem className="space-y-1 group md:col-span-2">
-                    <FormLabel className={cn("group-focus-within:text-primary transition-colors", form.formState.errors.additional_docs && "group-focus-within:text-destructive")}>
-                      Documentos adicionales
-                    </FormLabel>
-                    {(!!additional_docs) ? (
-                      <div className="flex items-center gap-2 p-2 pl-3 pr-4 rounded-md border transition-border justify-between shadow-sm hover:ring-1 ring-ring/50 transition-all">
-                        <div className="flex items-center gap-2">
-                          <span className="bg-indigo-400/20 text-indigo-500 shadow-lg shadow-indigo-400/20">
-                            <FileIcon className="w-3.5 h-3.5" />
-                          </span>
-                          <span className="font-medium text-sm">{additional_docs.name}</span>
-                        </div>
-                        <Button
-                          className="rounded-full h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
-                          variant="ghost"
-                          type="button"
-                          size="icon"
-                          onClick={() => {
-                            form.reset({
-                              ...form.getValues(),
-                              additional_docs: undefined,
-                            })
-                          }}
-                        >
-                          <X />
-                        </Button>
-                      </div>
-                    ) :
-                      <FormControl>
-                        <FileUploader
-                          id="additional_docs"
-                          onChange={(file) => {
-                            form.setValue("additional_docs", file, { shouldValidate: true })
                           }} />
                       </FormControl>
                     }

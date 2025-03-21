@@ -28,6 +28,8 @@ export const newPatientSchema = baseUserSchema.extend({
   .extend({
     city: z.string({ required_error: "La ciudad es requerida" }).min(1, { message: "La ciudad es requerida" }),
     state: z.string({ required_error: "La provincia es requerida" }).min(1, { message: "La provincia es requerida" }),
+    medical_insurance: z.string({ required_error: "La obra social es requerida" }).min(1, { message: "La obra social es requerida" }),
+    insurance_number: z.string({ required_error: "El número de afiliado es requerido" }).min(1, { message: "El número de afiliado es requerido" }),
   });
 
 export const newDoctorSchema = baseUserSchema.extend({
@@ -36,6 +38,8 @@ export const newDoctorSchema = baseUserSchema.extend({
   .merge(personCommonSchema)
   .extend({
     specialty: z.string({ required_error: "La especialidad es requerida" }).min(1, { message: "La especialidad es requerida" }),
+    national_licence: z.string({ required_error: "La matrícula nacional es requerida" }).min(1, { message: "La matrícula nacional es requerida" }),
+    provincial_licence: z.string().optional(),
   });
 
 export const newMedicalInstitutionSchema = baseUserSchema.extend({

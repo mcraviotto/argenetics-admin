@@ -10,6 +10,8 @@ export const listDoctorSchema = z.object({
   gender: z.enum(["male", "female", "other"]),
   phone_number: z.string(),
   specialty: z.string(),
+  national_licence: z.string(),
+  provincial_licence: z.string().optional(),
   medical_institutions: z.array(z.object({
     id: z.string(),
     name: z.string()

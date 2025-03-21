@@ -16,5 +16,19 @@ export const doctor_status_adapter = {
 }
 
 export const doctor_speciality_adapter = {
-  surgery: "Cirugía",
-}
+  cardiology: "Cardiología",
+  medical_clinic: "Clínica médica",
+  dermatology: "Dermatología",
+  endocrinology: "Endocrinología",
+  gastroenterology: "Gastroenterología",
+  medical_genetics: "Genética médica/AGO",
+  gynecology: "Ginecología",
+  hematology: "Hematología",
+  immunology: "Inmunología",
+  mastology: "Mastología",
+  nephrology: "Nefrología",
+  ophthalmology: "Oftalmología",
+  oncology: "Oncología",
+  pediatrics: "Pediatría",
+  urology: "Urología",
+};

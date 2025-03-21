@@ -63,6 +63,8 @@ export default function EditDoctorPage() {
       specialty: doctor?.specialty,
       medical_institutions: doctor?.medical_institutions,
       state: doctor?.user.state,
+      national_licence: doctor?.national_licence || "",
+      provincial_licence: doctor?.provincial_licence || "",
     },
   })
 
@@ -107,6 +109,8 @@ export default function EditDoctorPage() {
       specialty: doctor.specialty,
       medical_institutions: doctor.medical_institutions,
       state: doctor.user.state,
+      national_licence: doctor.national_licence,
+      provincial_licence: doctor.provincial_licence,
     })
   }, [doctor])
 
@@ -341,11 +345,85 @@ export default function EditDoctorPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="surgery">Cirugía</SelectItem>
-                      <SelectItem value="neurology">Neurología</SelectItem>
-                      <SelectItem value="pediatry">Pediatría</SelectItem>
+                      <SelectItem value="cardiology">Cardiología</SelectItem>
+                      <SelectItem value="medical_clinic">Clínica médica</SelectItem>
+                      <SelectItem value="dermatology">Dermatología</SelectItem>
+                      <SelectItem value="endocrinology">Endocrinología</SelectItem>
+                      <SelectItem value="gastroenterology">Gastroenterología</SelectItem>
+                      <SelectItem value="medical_genetics">Genética médica/AGO</SelectItem>
+                      <SelectItem value="gynecology">Ginecología</SelectItem>
+                      <SelectItem value="hematology">Hematología</SelectItem>
+                      <SelectItem value="immunology">Inmunología</SelectItem>
+                      <SelectItem value="mastology">Mastología</SelectItem>
+                      <SelectItem value="nephrology">Nefrología</SelectItem>
+                      <SelectItem value="ophthalmology">Oftalmología</SelectItem>
+                      <SelectItem value="oncology">Oncología</SelectItem>
+                      <SelectItem value="pediatrics">Pediatría</SelectItem>
+                      <SelectItem value="urology">Urología</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="national_licence"
+              render={({ field }) => (
+                <FormItem className="flex flex-col group">
+                  <FormLabel
+                    htmlFor="national_licence"
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.national_licence && "group-focus-within:text-destructive",
+                    )}
+                  >
+                    Matrícula nacional
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="national_licence"
+                      type="text"
+                      placeholder="123456789"
+                      autoComplete="new-password"
+                      className={cn(
+                        form.formState.errors.national_licence &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="provincial_licence"
+              render={({ field }) => (
+                <FormItem className="flex flex-col group">
+                  <FormLabel
+                    htmlFor="provincial_licence"
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.provincial_licence && "group-focus-within:text-destructive",
+                    )}
+                  >
+                    Matrícula provincial
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="provincial_licence"
+                      type="text"
+                      placeholder="123456789"
+                      autoComplete="new-password"
+                      className={cn(
+                        form.formState.errors.provincial_licence &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

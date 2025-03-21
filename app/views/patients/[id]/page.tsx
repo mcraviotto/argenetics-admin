@@ -78,6 +78,18 @@ export default function PatientPage() {
             </span>
           </div>
           <div className="flex flex-col gap-1">
+            <label className="text-muted-foreground text-sm">Obra social</label>
+            <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
+              {!patient ? placeholder(13) : patient.medical_insurance ?? ""}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-muted-foreground text-sm">Número de afiliado</label>
+            <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
+              {!patient ? placeholder(13) : patient.insurance_number ?? ""}
+            </span>
+          </div>
+          <div className="flex flex-col gap-1">
             <label className="text-muted-foreground text-sm">Número de teléfono</label>
             <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
               {!patient ? placeholder(13) : patient.phone_number ?? ""}

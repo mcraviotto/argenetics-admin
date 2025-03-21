@@ -75,6 +75,20 @@ export default function DoctorPage() {
               {!doctor ? placeholder(10) : doctor_speciality_adapter[doctor.specialty as keyof typeof doctor_speciality_adapter] ?? ""}
             </span>
           </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-muted-foreground text-sm">Matrícula nacional</label>
+            <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
+              {!doctor ? placeholder(10) : doctor.national_licence ?? ""}
+            </span>
+          </div>
+          {doctor?.provincial_licence &&
+            <div className="flex flex-col gap-1">
+              <label className="text-muted-foreground text-sm">Matrícula provincial</label>
+              <span className={cn("text-sm transition-all duration-300", isLoading ? "blur-[4px]" : "blur-none")}>
+                {!doctor ? placeholder(10) : doctor.provincial_licence}
+              </span>
+            </div>
+          }
           {user?.userable_type !== "MedicalInstitution" &&
             <div className="flex flex-col gap-1">
               <label className="text-muted-foreground text-sm">Centros médicos</label>

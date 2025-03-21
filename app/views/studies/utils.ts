@@ -20,6 +20,21 @@ export const study_status_adapter = {
     color: "bg-gray-200/50 text-gray-700 hover:bg-gray-300/50",
     patientLabel: "Solicitado, enviamos tu solicitud de estudios.",
   },
+  at_lab: {
+    label: "En laboratorio",
+    color: "bg-blue-200/50 text-blue-700 hover:bg-blue-300/50",
+    patientLabel: "El estudio se encuentra en laboratorio.",
+  },
+  report_completed: {
+    label: "Informe realizado",
+    color: "bg-purple-200/50 text-purple-700 hover:bg-purple-300/50",
+    patientLabel: "El informe del estudio está listo.",
+  },
+  pending_pickup: {
+    label: "Coordina retiro",
+    color: "bg-amber-200/50 text-amber-700 hover:bg-amber-300/50",
+    patientLabel: "Coordina el retiro de tu estudio.",
+  },
 }
 
 export const formatReference = (ref: string): string => {

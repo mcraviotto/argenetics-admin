@@ -11,6 +11,8 @@ export const listPatientSchema = z.object({
   phone_number: z.string(),
   state: z.string(),
   city: z.string(),
+  medical_insurance: z.string(),
+  insurance_number: z.string(),
   user: z.object({
     id: z.string(),
     email: z.string(),

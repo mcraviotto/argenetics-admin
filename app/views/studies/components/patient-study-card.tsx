@@ -4,15 +4,16 @@ import { downloadFileFromUrl, study_status_adapter } from "../utils";
 import { ListStudy } from "@/schemas/studies";
 import { study_options } from "../data";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
-import { useLazyDownloadStudyQuery } from "@/services/studies";
+import { Download, RotateCcw } from "lucide-react";
+import { useLazyDownloadStudyQuery, useRequestToDownloadStudyMutation, useUpdateStudyMutation } from "@/services/studies";
 
 export default function PatientStudyCard({ study }: { study: ListStudy }) {
   const studyTitle =
     study_options.flatMap(category => category.items).find(s => s.value === study.title)?.label ||
     study.title;
 
-  const [downloadStudy, { isLoading }] = useLazyDownloadStudyQuery();
+  const [downloadStudy, { isLoading: isDownloadingStudy }] = useLazyDownloadStudyQuery();
+  const [requestDownload, { isLoading: isRequestingDownload }] = useRequestToDownloadStudyMutation();
 
   const handleDownload = async (id: string) => {
     const document_type = "result";
@@ -26,8 +27,16 @@ export default function PatientStudyCard({ study }: { study: ListStudy }) {
     }
   };
 
+  const handleUpdateStudyStatus = async (id: string) => {
+    try {
+      await requestDownload(id);
+    } catch (error) {
+      console.error(`Error al actualizar el estado del estudio:`, error);
+    }
+  }
+
   return (
-    <div className="flex flex-col bg-background p-4 rounded-md shadow-md h-auto md:h-[148px]">
+    <div className="flex flex-col bg-background p-4 rounded-md shadow-md h-auto md:h-full">
       <div className="flex justify-between flex-wrap">
         <span className="text-md font-medium">{studyTitle}</span>
         <Badge
@@ -50,11 +59,21 @@ export default function PatientStudyCard({ study }: { study: ListStudy }) {
         </div>
       </div>
       <div className="mt-4 sm:mt-auto">
-        {study.state === "ready_to_download" ? (
+        {study.state === "expired" ? (
           <Button
-            className="mt-4 w-full md:w-[115px]"
+            className="mt-4 w-full md:w-[167px]"
             size="sm"
-            loading={isLoading}
+            loading={isRequestingDownload}
+            onClick={() => handleUpdateStudyStatus(study.id)}
+          >
+            <RotateCcw className="mr-1" />
+            Solicitar de nuevo
+          </Button>
+        ) : study.state === "ready_to_download" ? (
+          <Button
+            className="mt-8 w-full md:w-[115px]"
+            size="sm"
+            loading={isDownloadingStudy}
             onClick={() => handleDownload(study.id)}
           >
             <Download className="mr-1" />

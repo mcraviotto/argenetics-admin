@@ -5,7 +5,7 @@ export const listStudySchema = z.object({
   title: z.string(),
   code: z.string(),
   date: z.string(),
-  state: z.enum(["ready_to_download", "initial", "requested_to_download", "expired"]),
+  state: z.enum(["ready_to_download", "initial", "requested_to_download", "expired", "pending_pickup", "at_lab", "report_completed"]),
   metadata: z.string(),
   storage_ref: z.string(),
   medical_order_ref: z.string(),
@@ -19,6 +19,9 @@ export const listStudySchema = z.object({
     id: z.string(),
   }),
   additional_docs_storage_ref: z.string(),
+  consent_storage_ref: z.string(),
+  clinical_records_storage_ref: z.string(),
+  histopathological_storage_ref: z.string(),
 })
 
 export const listStudiesResponseSchema = z.object({
@@ -32,12 +35,15 @@ export const listStudiesResponseSchema = z.object({
 export const newStudySchema = z.object({
   title: z.string({ required_error: "El título es requerido" }).min(1, "El título es requerido"),
   code: z.string().optional(),
-  state: z.enum(["ready_to_download", "initial", "requested_to_download", "expired"], { required_error: "El estado es requerido" }),
+  state: z.enum(["ready_to_download", "initial", "requested_to_download", "expired", "pending_pickup", "at_lab", "report_completed"], { required_error: "El estado es requerido" }),
   storage_ref: z.instanceof(File).optional(),
   medical_order_ref: z.instanceof(File, { message: "La orden médica es requerida" }),
   additional_docs_storage_ref: z.instanceof(File).optional(),
   patient_id: z.string({ required_error: "El paciente es requerido" }).min(1, "El paciente es requerido"),
   doctor_id: z.string().optional(),
+  consent_storage_ref: z.instanceof(File).optional(),
+  clinical_records_storage_ref: z.instanceof(File).optional(),
+  histopathological_storage_ref: z.instanceof(File).optional(),
 })
 
 export type ListStudy = z.infer<typeof listStudySchema>

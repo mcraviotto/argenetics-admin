@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar-rac"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DateInput } from "@/components/ui/datefield-rac"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
@@ -49,6 +49,8 @@ export default function DoctorRegisterPage() {
       email: "",
       identification_number: "",
       phone_number: "",
+      national_licence: "",
+      provincial_licence: "",
     },
   })
 
@@ -68,7 +70,7 @@ export default function DoctorRegisterPage() {
       router.push("/otp")
     } catch (err: any) {
       toast.custom((t) => (
-        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-full max-w-[356px] text-accent shadow-red-600/50">
+        <div className="flex flex-col gap-1 bg-red-600 border-red-800 p-4 rounded-md shadow-lg w-[356px] text-accent shadow-red-600/50">
           <p className="font-medium">Algo salió mal</p>
           <p className="text-sm">{err.data.error || "Ocurrió un error inesperado"}</p>
         </div>
@@ -379,6 +381,68 @@ export default function DoctorRegisterPage() {
             />
             <FormField
               control={form.control}
+              name="national_licence"
+              render={({ field }) => (
+                <FormItem className="flex flex-col group">
+                  <FormLabel
+                    htmlFor="national_licence"
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.national_licence && "group-focus-within:text-destructive",
+                    )}
+                  >
+                    Matrícula nacional
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="national_licence"
+                      type="text"
+                      placeholder="123456789"
+                      autoComplete="new-password"
+                      className={cn(
+                        form.formState.errors.national_licence &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="provincial_licence"
+              render={({ field }) => (
+                <FormItem className="flex flex-col group">
+                  <FormLabel
+                    htmlFor="provincial_licence"
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.provincial_licence && "group-focus-within:text-destructive",
+                    )}
+                  >
+                    Matrícula provincial
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="provincial_licence"
+                      type="text"
+                      placeholder="123456789"
+                      autoComplete="new-password"
+                      className={cn(
+                        form.formState.errors.provincial_licence &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="specialty"
               render={({ field }) => (
                 <FormItem className="flex flex-col group">
@@ -403,9 +467,21 @@ export default function DoctorRegisterPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="surgery">Cirugía</SelectItem>
-                      {/*                       <SelectItem value="neurology">Neurología</SelectItem>
-                      <SelectItem value="pediatry">Pediatría</SelectItem> */}
+                      <SelectItem value="cardiology">Cardiología</SelectItem>
+                      <SelectItem value="medical_clinic">Clínica médica</SelectItem>
+                      <SelectItem value="dermatology">Dermatología</SelectItem>
+                      <SelectItem value="endocrinology">Endocrinología</SelectItem>
+                      <SelectItem value="gastroenterology">Gastroenterología</SelectItem>
+                      <SelectItem value="medical_genetics">Genética médica/AGO</SelectItem>
+                      <SelectItem value="gynecology">Ginecología</SelectItem>
+                      <SelectItem value="hematology">Hematología</SelectItem>
+                      <SelectItem value="immunology">Inmunología</SelectItem>
+                      <SelectItem value="mastology">Mastología</SelectItem>
+                      <SelectItem value="nephrology">Nefrología</SelectItem>
+                      <SelectItem value="ophthalmology">Oftalmología</SelectItem>
+                      <SelectItem value="oncology">Oncología</SelectItem>
+                      <SelectItem value="pediatrics">Pediatría</SelectItem>
+                      <SelectItem value="urology">Urología</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

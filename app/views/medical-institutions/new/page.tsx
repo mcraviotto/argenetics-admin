@@ -160,7 +160,7 @@ export default function NewDoctorPage() {
                     <Input
                       id="address"
                       type="address"
-                      placeholder="Jhon"
+                      placeholder="Av. Siempre Viva 123"
                       className={cn(form.formState.errors.address && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
                       {...field}
                     />

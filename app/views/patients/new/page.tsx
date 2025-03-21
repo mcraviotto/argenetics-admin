@@ -46,6 +46,8 @@ export default function NewPatientPage() {
       identification_number: "",
       phone_number: "",
       state: "",
+      medical_insurance: "",
+      insurance_number: "",
     },
   })
 
@@ -340,6 +342,64 @@ export default function NewPatientPage() {
                       type="city"
                       placeholder="Ciudad"
                       className={cn(form.formState.errors.city && "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="medical_insurance"
+              render={({ field }) => (
+                <FormItem className="flex flex-col group">
+                  <FormLabel
+                    htmlFor="medical_insurance"
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.medical_insurance && "group-focus-within:text-destructive",
+                    )}
+                  >
+                    Obra social
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="medical_insurance"
+                      placeholder="Obra social"
+                      className={cn(
+                        form.formState.errors.medical_insurance &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="insurance_number"
+              render={({ field }) => (
+                <FormItem className="flex flex-col group">
+                  <FormLabel
+                    htmlFor="insurance_number"
+                    className={cn(
+                      "group-focus-within:text-primary transition-colors",
+                      form.formState.errors.insurance_number && "group-focus-within:text-destructive",
+                    )}
+                  >
+                    Número de afiliado
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="insurance_number"
+                      placeholder="123456789"
+                      className={cn(
+                        form.formState.errors.insurance_number &&
+                        "border-destructive hover:border-destructive focus:!border-destructive focus:!shadow-destructive/25",
+                      )}
                       {...field}
                     />
                   </FormControl>
